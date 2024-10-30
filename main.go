@@ -24,6 +24,7 @@ func session_template(w http.ResponseWriter, name string, r *http.Request, vals 
     if auth, ok := session.Values["authenticated"].(bool); ok && auth {
         c["SessionName"] = session.Values["username"];
     }
+    fmt.Println("porcoiddio",name)
 
     err := templates.ExecuteTemplate(w, name, c);
     return err;
@@ -79,20 +80,35 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
+func setCookieHeadersMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Set security-related headers
+        w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+        w.Header().Set("X-Content-Type-Options", "nosniff")
+        w.Header().Set("X-Frame-Options", "DENY")
+
+        // Proceed to the next handler
+        next.ServeHTTP(w, r)
+    })
+}
+
+
 func main() {
     fmt.Println("Start")
     init_db();
     defer db.Close()
     
+    mux := http.NewServeMux()
+
     file_server := http.StripPrefix("/static/", http.FileServer(http.Dir("./static")));
-    http.Handle("/static/", file_server);
+    mux.Handle("/static/", file_server);
 
-    http.HandleFunc("/", index_handler);
+    mux.HandleFunc("/", index_handler);
 
-    http.HandleFunc("/ws", websocketHandler);
+    mux.HandleFunc("/ws", websocketHandler);
 
-    http.HandleFunc("/login", login_handler);
-    http.HandleFunc("/register", register_handler);
+    mux.HandleFunc("/login", login_handler);
+    mux.HandleFunc("/register", register_handler);
 
-    log.Fatal(http.ListenAndServe(":2357", nil));
+    log.Fatal(http.ListenAndServe(":2357", mux));
 }

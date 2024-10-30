@@ -11,8 +11,8 @@
                     <div class="hr"></div>
                     <div class="section">
                         <form action="#" enctype="multipart/form-data" method="POST">
-                            <input name="mail" {{if .Mail_error}} class="wrong" {{end}}> <br/>
-                            <input name="password" {{if .Password_error}} class="wrong" {{end}}> <br/>
+                            <input name="mail" {{if .LoginError}} class="wrong" {{end}}> <br/>
+                            <input name="password" {{if .LoginError}} class="wrong" {{end}}> <br/>
                             <input type="submit" value="invia">
                         </form>
                     </div>

@@ -1,14 +1,14 @@
 package main
 
 import (
-    "io"
-    "log"
-    "net/http"
-    "os"
+	"io"
+	"log"
+	"net/http"
+	"os"
 
-    "github.com/gorilla/sessions"
-    "github.com/joho/godotenv"
-    "golang.org/x/crypto/bcrypt"
+	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var err = godotenv.Load(".dotenv")
@@ -127,7 +127,7 @@ func login_handler(w http.ResponseWriter, r *http.Request) {
 
     valid_inputs := true;
 
-    rows, err := db.Query("SELECT mail,name FROM users WHERE mail=$1 and psw=$2", mail, hashed);
+    rows, err := db.Query("SELECT mail,name,psw FROM users WHERE mail=$1", mail, hashed);
     if err!=nil {
         log.Println("Can't lookup user");
         http_err(w, err);
@@ -136,9 +136,14 @@ func login_handler(w http.ResponseWriter, r *http.Request) {
     defer rows.Close();
     var user User;
     if rows.Next() {
-        rows.Scan(&user.mail, &user.username);
+        rows.Scan(&user.mail, &user.username, &user.psw);
     }else{
-        log.Println("wrong credentials", mail, hashed)
+        log.Println("email not found", mail, hashed)
+        templ_values.LoginError = true;
+        valid_inputs = false;
+    }
+    if check_password(user.psw, password) != nil{
+        log.Println("pasword non matcha", mail, hashed)
         templ_values.LoginError = true;
         valid_inputs = false;
     }
@@ -149,7 +154,7 @@ func login_handler(w http.ResponseWriter, r *http.Request) {
     }
 
     log_in_user(w,r,&user);
-    http.Redirect(w, r, "/index", 0);
+    http.Redirect(w, r, "/index", http.StatusPermanentRedirect);
 }
 
 func log_in_user(w http.ResponseWriter, r *http.Request, user *User) {
@@ -163,4 +168,5 @@ func log_in_user(w http.ResponseWriter, r *http.Request, user *User) {
 type User struct {
     username string;
     mail string;
+    psw string;
 };
