@@ -1,0 +1,334 @@
+:root {
+    --shade1: #0097af;
+    --shade2: #007284;
+    --shade3: #122d24;
+    --shade4: #1e4548;
+    --shade5: #36647a;
+    --shade6: #6087b7;
+    --shade7: #dcedff;
+    --shade8: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    /*transition: color 200ms ease-in-out, background-color 200ms ease-in-out;*/
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 68px;
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center;
+    margin: 0;
+    background-color: var(--shade8);
+}
+
+p, h1, h2, h3, li, a, b, span, label, code, figcaption {
+    color: var(--shade1);
+}
+.dark p, .dark h1, .dark h2, .dark h3, .dark li, .dark a, .dark b, .dark span, .dark label, .dark code, .dark figcaption {
+    color: var(--shade8);
+}
+
+body.dark {
+    background-color: var(--shade1);
+    color: var(--shade8);
+}
+
+p,ul {
+    font-size: large;
+}
+
+#mainContainer {
+    padding-bottom: 35px;
+    width: 80%;
+    min-height: calc(100vh - 65px - 63px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#titoloPagina {
+    font-size: 50px;
+}
+
+ul {
+    list-style: square;
+}
+
+.hr {
+    width: 100%;
+    height: 3px;
+    background-color: var(--shade1);
+    margin-bottom: 15px;
+}
+.hr2 {
+    width: 90%;
+    height: 2px;
+    background-color: var(--shade1);
+}
+div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
+    margin-bottom: 6px;
+}
+
+
+.dark .hr, .dark .hr2 {
+    background-color: var(--shade8);
+}
+
+/* BOX */
+.box {
+    width: 100%;
+    padding: 0 20px;
+    border-radius: 1rem;
+    /*box-shadow: 2px 2px 5px var(--shade1);*/
+    box-shadow: 0px 0px 0px 3px var(--shade1);
+    transition: box-shadow 200ms ease-in-out
+}
+.dark .box {
+    box-shadow: 0px 0px 0px 3px var(--shade8);
+}
+.boxes {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    row-gap: 20px;
+}
+
+/* NAVBAR */
+#navBar {
+    z-index: 100;
+    background-color: var(--shade1);
+    position: sticky;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-size: 25px;
+    font-weight: 500;
+}
+
+.dark #navBar {
+    background-color: var(--shade8);
+}
+
+.navBarSection {
+    display: flex;
+    overflow: hidden;
+}
+
+#navBar a {
+    padding: 15px;
+    text-decoration: none;
+    color: var(--shade8);
+    background-color: transparent;
+    transition: all 200ms ease-in-out;
+    cursor: pointer;
+}
+
+.dark #navBar a {
+    color: var(--shade1);
+}
+
+#navBar a:hover {
+    color: var(--shade1);
+    background-color: var(--shade8);
+}
+
+.dark #navBar a:hover {
+    color: var(--shade8);
+    background-color: var(--shade1);
+}
+
+#navTitle {
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+#navCollapse {
+    display: none;
+}
+
+
+
+/* FOOTER */
+#footer {
+    background-color: var(--shade1);
+    text-align: center;
+    width: 100%;
+    height: 63px;
+    position: relative;
+}
+#footer p {
+    color: var(--shade8);
+}
+.dark #footer p {
+    color: var(--shade1);
+} 
+
+.dark #footer {
+    background-color: var(--shade8);
+}
+
+
+
+/* VARIE */
+.bordered {
+    border: 3px solid var(--shade1);
+}
+.dark .bordered {
+    border: 3px solid var(--shade8);
+}
+
+.wide {
+    width: 100%;
+}
+
+.flex {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+.flex > div:not(.V) {
+    /*width: 100%;*/
+}
+.even {
+    justify-content: space-evenly;
+}
+.center {
+    justify-content: center;
+}
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+figure {
+    margin: 10px;
+    border: 2px solid var(--shade1);
+    border-radius: 4px;
+}
+.dark figure {
+    border: 2px solid var(--shade8);
+}
+figure {
+    padding: 4px;
+}
+
+img {
+    object-fit: contain;
+}
+
+.dark-only {
+    display: none;
+}
+.dark .dark-only {
+    display: unset;
+}
+.dark .light-only {
+    display: none;
+}
+
+.collapseButton {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    align-items: flex-end;
+}
+.collapseButton .V {
+    transition: color 200ms ease-in-out, background-color 200ms ease-in-out, transform 300ms ease-in-out ; /*cubic-bezier(0.69,-0.65, 0.62, 1.22)*/
+}
+.flipped {
+    transform: rotateZ(90deg);
+}
+.section {
+    overflow: hidden;
+    transition: max-height 300ms ease-in-out;
+}
+
+.V {
+    width: 43px;
+    height: 43px;
+    background-color: var(--shade1);
+    /*clip-path: polygon(20% 20%, 80% 20%, 50% 80%);*/
+    clip-path: polygon(15% 36%, 25% 26%, 50% 51%, 75% 26%, 85% 36%, 50% 71%);
+    margin-bottom: 6px;
+}
+.dark .V {
+    background-color: var(--shade8);
+}
+
+
+/* PALETTE */
+#palette {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+}
+
+#p1, #p2, #p3, #p4, #p5, #p6, #p7, #p8 {
+    width: 20px;
+    height: 20px;
+}
+
+#p1 { background-color: var(--shade1); }
+#p2 { background-color: var(--shade2); }
+#p3 { background-color: var(--shade3); }
+#p4 { background-color: var(--shade4); }
+#p5 { background-color: var(--shade5); }
+#p6 { background-color: var(--shade6); }
+#p7 { background-color: var(--shade7); }
+#p8 { background-color: var(--shade8); }
+
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    #mainContainer {
+        min-height: calc(100vh - 33px - 63px);
+    }
+    .boxes {
+        row-gap: 0px;
+    }
+    #mainContainer, .boxes, .box {
+        width: 100%;
+    }
+    .box {
+        border-radius: 0%;
+    }
+    #titoloPagina {
+        font-size:5rex;
+    }
+    #navBar {
+        font-size:unset;
+        text-overflow: clip;
+    }
+    #hobby-contatti {
+        flex-direction: column;
+    }
+    #navBar {
+        flex-direction: column;
+    }
+    #navBar a {
+        padding: 6px;
+        text-decoration-thickness: 2px;
+    }
+
+    #navCollapse {
+        display: block;
+    }
+    .navCollapsible {
+        max-height: 0;
+        transition: max-height 200ms ease-in-out;
+    }
+
+    
+}

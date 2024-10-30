@@ -1,0 +1,38 @@
+{{define "login"}}
+    {{template "header" .}}
+    <body>
+        {{template "navbar" .}}
+        <div id="mainContainer">
+            <h1 id="titoloPagina">LOGIN</h1>
+
+            <div class="boxes">
+                <div class="box">
+                    <div class="flex collapseButton"><h1>Accedi</h1> <div class="V"></div></div>
+                    <div class="hr"></div>
+                    <div class="section">
+                        <form action="#" enctype="multipart/form-data" method="POST">
+                            <input name="mail" {{if .Mail_error}} class="wrong" {{end}}> <br/>
+                            <input name="password" {{if .Password_error}} class="wrong" {{end}}> <br/>
+                            <input type="submit" value="invia">
+                        </form>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="flex collapseButton"><h1>Non Hai Un Account?</h1> <div class="V"></div></div>
+                    <div class="hr"></div>
+                    <div class="section">
+                        <form action="/register" enctype="multipart/form-data" method="POST">
+                            <input name="username" {{if .Username_error}} class="wrong" {{end}}> <br/>
+                            <input name="password" {{if .Password_error}} class="wrong" {{end}}> <br/>
+                            <input name="image" type="file"> <br/>
+                            <input name="mail" {{if .Mail_error}} class="wrong" {{end}}> <br/>
+                            <input type="submit" value="invia">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{template "footer" .}}
+    </body>
+    </html>
+    {{end}}

@@ -1,0 +1,43 @@
+{{define "index"}}
+<html>
+    {{template "header" .}}
+    <body>
+        {{template "navbar" .}}
+        <div id="mainContainer">
+            <h1 id="titoloPagina">MINES ONLINE</h1>
+
+            <div class="boxes">
+                <div class="box">
+                    <div class="section">
+                        ciaoc
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="flex collapseButton"><h1>Come Giocare</h1> <div class="V"></div></div>
+                    <div class="hr"></div>
+                    <div class="section">
+                        <p>
+                        Campo minato può sembrare un gioco astruso o complesso a primo occhio, ma credo questo sia solo l'effetto di una brutta anomea che il gioco ha preso nel tempo. <br>
+                        Le regole sono poche e piuttosto semplici:
+                        </p>
+                        <ul>
+                            <li>Alcune celle contengono bombe</li>
+                            <li>Ogni cella "sicura" contiene il numero di bombe che la circondano</li>
+                            <ul>
+                                <li>Vengono considerate le 8 celle circostanti incluse le diagonali</li>
+                            </ul>
+                            <li>Quando una cella con il valore di 0 viene scoperta, tutte quelle circostanti vengono scoperte a loro volta</li>
+                            <ul>
+                                <li>Questo passaggio va poi a ripetersi sulle celle così scoperte</li>
+                            </ul>
+                            <li>Quando scopri una bomba perdi</li>
+                            <li>Quando scopri tutte le celle sicure vinci</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{template "footer" .}}
+    </body>
+</html>
+{{end}}
