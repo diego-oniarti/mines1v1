@@ -17,6 +17,7 @@ var store = sessions.NewCookieStore([]byte(os.Getenv("SESSION_SECRET")))
 func hash_password(psw string) (string, error) {
     hashed, err := bcrypt.GenerateFromPassword([]byte(psw), bcrypt.DefaultCost)
     if err != nil {
+        log.Println(err);
         return "", err
     }
     return string(hashed), nil;
@@ -34,7 +35,7 @@ func register_handler(w http.ResponseWriter, r *http.Request) {
     templ_values := struct {Username_error bool; Password_error bool; Mail_error bool;}{false,false,false};
 
     if r.Method != http.MethodPost {
-        if err := templates.ExecuteTemplate(w, "login", nil); err!=nil {
+        if err := session_template(w, "login", r, nil); err!=nil {
             http_err(w, err);
         }
         return;
@@ -88,7 +89,7 @@ func register_handler(w http.ResponseWriter, r *http.Request) {
     // TODO aggiungere una validazione serverside della sicurezza della password. No db access required
 
     if !valid_inputs {
-        templates.ExecuteTemplate(w, "login", templ_values);
+        session_template(w, "login", r, templ_values);
         return;
     }
 
@@ -100,7 +101,7 @@ func register_handler(w http.ResponseWriter, r *http.Request) {
 
     log_in_user(w,r, &User{username: username, mail: mail});
 
-    templates.ExecuteTemplate(w, "index", nil);
+    http.Redirect(w, r, "/", http.StatusPermanentRedirect);
 }
 
 
@@ -109,7 +110,7 @@ func login_handler(w http.ResponseWriter, r *http.Request) {
     templ_values := struct {LoginError bool;}{false};
 
     if r.Method != http.MethodPost {
-        if err := templates.ExecuteTemplate(w, "login", nil); err!=nil {
+        if err := session_template(w, "login", r, nil); err!=nil {
             http_err(w, err);
         }
         return;
@@ -137,21 +138,21 @@ func login_handler(w http.ResponseWriter, r *http.Request) {
     if rows.Next() {
         rows.Scan(&user.mail, &user.username);
     }else{
+        log.Println("wrong credentials", mail, hashed)
         templ_values.LoginError = true;
         valid_inputs = false;
     }
 
     if !valid_inputs {
-        templates.ExecuteTemplate(w, "login", templ_values);
+        session_template(w, "login", r, templ_values);
         return;
     }
 
     log_in_user(w,r,&user);
-    templates.ExecuteTemplate(w, "index", nil);
+    http.Redirect(w, r, "/index", 0);
 }
 
 func log_in_user(w http.ResponseWriter, r *http.Request, user *User) {
-    // Create a new session
     session, _ := store.Get(r, "x-mines-session")
     session.Values["authenticated"] = true
     session.Values["username"] = user.username

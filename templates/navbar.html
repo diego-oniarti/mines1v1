@@ -9,7 +9,11 @@
     <div class="navBarSection navCollapsible">
         <a id="themeButton">◑</a>
         <a id="languageButton">🇮🇹</a>
-        <a href="/login">login</a>
+        {{if .SessionName}}
+            <a>{{.SessionName}}</a>
+        {{else}}
+            <a href="/login">login</a>
+        {{end}}
     </div>
 </div>
 

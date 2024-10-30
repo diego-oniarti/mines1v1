@@ -2,15 +2,32 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+
 	"github.com/gorilla/websocket"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var templates = template.Must(template.ParseGlob("./templates/*.html"));
+func session_template(w http.ResponseWriter, name string, r *http.Request, vals any) error {
+    if vals == nil {vals = struct{}{}}
+
+    b, _ := json.Marshal(&vals);
+    var c map[string]interface{};
+    json.Unmarshal(b, &c);
+
+    session, _ := store.Get(r, "x-mines-session")
+    if auth, ok := session.Values["authenticated"].(bool); ok && auth {
+        c["SessionName"] = session.Values["username"];
+    }
+
+    err := templates.ExecuteTemplate(w, name, c);
+    return err;
+}
 
 var db *sql.DB;
 func init_db() error {
@@ -28,7 +45,7 @@ func init_db() error {
 
 
 func index_handler(w http.ResponseWriter, r *http.Request) {
-    err := templates.ExecuteTemplate(w, "index", nil);
+    err := session_template(w, "index", r, nil);
     if err!=nil {
         http.Error(w, "Internal error", http.StatusInternalServerError);
         log.Println(err);
@@ -70,7 +87,7 @@ func main() {
     file_server := http.StripPrefix("/static/", http.FileServer(http.Dir("./static")));
     http.Handle("/static/", file_server);
 
-    http.HandleFunc("/", index_handler)
+    http.HandleFunc("/", index_handler);
 
     http.HandleFunc("/ws", websocketHandler);
 
