@@ -11,11 +11,6 @@ import (
 
 // RenderIndexPage renders the index page for logged-in users
 func indexHandler(c *gin.Context) {
-    // isAuthenticated := c.GetBool("isAuthenticated")
-    // if !isAuthenticated {
-    //     c.Redirect(http.StatusTemporaryRedirect, "/login")
-    //     return;
-    // }
     username := c.GetString("username")
     c.HTML(http.StatusOK, "index.html", gin.H{"username": username})
 }
@@ -24,6 +19,17 @@ func indexHandler(c *gin.Context) {
 func loginPageHandler(c *gin.Context) {
     c.HTML(http.StatusOK, "login.html", nil)
 }
+
+// Render the profile page
+func profilePageHandler(c *gin.Context) {
+    isAuthenticated := c.GetBool("isAuthenticated")
+    if !isAuthenticated {
+        c.Redirect(http.StatusTemporaryRedirect, "/login")
+        return;
+    }
+    c.HTML(http.StatusOK, "user.html", nil)
+}
+
 
 // Handle login with password verification
 func loginHandler(c *gin.Context) {
@@ -102,5 +108,5 @@ func registerHandler(c *gin.Context) {
     session.Values["username"] = username
     session.Save(c.Request, c.Writer)
 
-    c.Redirect(http.StatusSeeOther, "/")
+    c.HTML(http.StatusOK, "registration_complete.html", nil);
 }
