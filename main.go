@@ -10,6 +10,8 @@ import (
 var store *sessions.CookieStore
 
 func main() {
+    defer db.Close();
+
     // Load environment variables
     err := godotenv.Load(".env")
     if err != nil {

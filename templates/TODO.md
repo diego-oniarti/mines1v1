@@ -1,0 +1,3 @@
+- [ ] Creare il database se non esiste già
+- [ ] Aggiungere un campo per la chiave randomica all'utente
+- [ ] Inviare mail
