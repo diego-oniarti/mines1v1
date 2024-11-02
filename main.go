@@ -10,13 +10,12 @@ import (
 var store *sessions.CookieStore
 
 func main() {
-    defer db.Close();
-
-    // Load environment variables
     err := godotenv.Load(".env")
     if err != nil {
         panic("Error loading .env file")
     }
+
+    defer db.Close();
 
     sessionKey := []byte(os.Getenv("SESSION_SECRET"))
     store = sessions.NewCookieStore(sessionKey)
@@ -31,9 +30,11 @@ func main() {
 
     // Define routes
     r.GET("/", indexHandler)
+    r.POST("/", indexHandler)
     r.GET("/login", loginPageHandler)
     r.POST("/login", loginHandler)
     r.POST("/register", registerHandler)
+    r.POST("/verify", verifyHandler)
 
     // Start server on port 8080
     r.Run(":2357")
