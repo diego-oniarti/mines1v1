@@ -17,18 +17,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// RenderIndexPage renders the index page for logged-in users
 func indexHandler(c *gin.Context) {
     username := c.GetString("username")
     c.HTML(http.StatusOK, "index.html", gin.H{"username": username})
 }
 
-// Render the login page
 func loginPageHandler(c *gin.Context) {
     c.HTML(http.StatusOK, "login.html", nil)
 }
 
-// Render the profile page
 func profilePageHandler(c *gin.Context) {
     isAuthenticated := c.GetBool("isAuthenticated")
     if !isAuthenticated {
@@ -39,15 +36,15 @@ func profilePageHandler(c *gin.Context) {
 }
 
 
-// Handle login with password verification
 func loginHandler(c *gin.Context) {
     mail := c.PostForm("mail")
     password := c.PostForm("password")
 
     var user User
-    err := db.QueryRow("SELECT username, psw, confirmed FROM users WHERE mail=?", mail).
-        Scan(&user.Username, &user.Psw, &user.Confirmed)
+    err := db.QueryRow("SELECT name, psw FROM users WHERE mail=? AND confirmed=true", mail).
+        Scan(&user.Username, &user.Psw)
     if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.Psw), []byte(password)) != nil {
+        log.Println(err)
         c.HTML(http.StatusUnauthorized, "login.html", gin.H{"LoginError": "Invalid email or password"})
         return
     } else if err != nil {
@@ -56,7 +53,6 @@ func loginHandler(c *gin.Context) {
         return
     }
 
-    // Set session for authenticated user
     session, _ := store.Get(c.Request, "session-name")
     session.Values["authenticated"] = true
     session.Values["username"] = user.Username
@@ -65,13 +61,11 @@ func loginHandler(c *gin.Context) {
     c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
-// Handle user registration with image upload, unique username and email checks
 func registerHandler(c *gin.Context) {
     username := c.PostForm("username")
     mail := c.PostForm("mail")
     password := c.PostForm("password")
 
-    // Image processing
     var imageData []byte
     image, _, err := c.Request.FormFile("image")
     if err == nil {
@@ -90,7 +84,6 @@ func registerHandler(c *gin.Context) {
         return
     }
 
-    // Input validation
     var usernameExists, mailExists bool
     db.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE name=?)", username).Scan(&usernameExists)
     db.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE mail=?)", mail).Scan(&mailExists)
@@ -105,7 +98,6 @@ func registerHandler(c *gin.Context) {
 
     send_mail(mail, code, username);
 
-    // Insert the user into the database
     _, err = db.Exec("INSERT INTO users (name, image, psw, mail, confirmed, confirm_key) VALUES (?, ?, ?, ?, false, ?)",
         username, imageData, hashedPassword, mail, code)
     if err != nil {
@@ -161,6 +153,8 @@ func send_mail(mail, code, name string) {
         log.Println(err);
         return;
     }
+
+    fmt.Println(builder.String())
 
     msg := "From: " + from + "\n" +
         "To: " + mail + "\n" +

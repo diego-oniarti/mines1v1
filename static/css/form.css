@@ -1,3 +1,32 @@
 .wrong {
     border: 1px solid red;
 }
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+td:first-child {
+    text-align: right;
+    font-size: x-large;
+}
+
+input {
+    border: 2px solid var(--shade1);
+    border-radius: 20px;
+    font-size: large;
+    padding: 5px;
+}
+input:focus-visible, input:focus {
+    border: 2px solid var(--shade1);
+}
+
+input {
+    background-color: var(--shade8);
+    transition: border-radius 125ms ease-in-out;
+}
+input:hover, input:focus {
+    border-radius: 0px;
+    outline: none;
+}

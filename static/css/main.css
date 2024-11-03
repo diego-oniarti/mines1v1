@@ -30,7 +30,7 @@ body {
     background-color: var(--shade8);
 }
 
-p, h1, h2, h3, li, a, b, span, label, code, figcaption {
+p, h1, h2, h3, li, a, b, span, label, code, figcaption, input {
     color: var(--shade1);
 }
 .dark p, .dark h1, .dark h2, .dark h3, .dark li, .dark a, .dark b, .dark span, .dark label, .dark code, .dark figcaption {
@@ -252,6 +252,11 @@ img {
 .section {
     overflow: hidden;
     transition: max-height 300ms ease-in-out;
+}
+.section.centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .V {

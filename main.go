@@ -20,22 +20,19 @@ func main() {
     sessionKey := []byte(os.Getenv("SESSION_SECRET"))
     store = sessions.NewCookieStore(sessionKey)
 
-    // Initialize Gin router
     r := gin.Default()
     r.LoadHTMLGlob("templates/*")
     r.Use(SessionMiddleware())
 
-    // Serve static files from the "static" directory
     r.Static("/static", "./static")
 
-    // Define routes
     r.GET("/", indexHandler)
     r.POST("/", indexHandler)
     r.GET("/login", loginPageHandler)
     r.POST("/login", loginHandler)
     r.POST("/register", registerHandler)
     r.POST("/verify", verifyHandler)
+    r.GET("/user", profilePageHandler)
 
-    // Start server on port 8080
     r.Run(":2357")
 }
