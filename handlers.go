@@ -67,13 +67,13 @@ func registerHandler(c *gin.Context) {
 
     validInputs := true;
     if utf8.RuneCountInString(username)<1 { validInputs = false; }
-    if utf8.RuneCountInString(password)<1 { validInputs = false; }
+    if utf8.RuneCountInString(password)<8 { validInputs = false; }
     if m, err := regexp.MatchString(".+@.+\\..+", mail); !m || err!=nil { validInputs = false; }
     if m, err := regexp.MatchString("[_!?(){}#$%^&*.,+\\[\\]=+\"']", password); !m || err!=nil { validInputs = false; }
     if m, err := regexp.MatchString("[a-z]", password); !m || err!=nil { validInputs = false; }
     if m, err := regexp.MatchString("[A-Z]", password); !m || err!=nil { validInputs = false; }
     if m, err := regexp.MatchString("[0-9]", password); !m || err!=nil { validInputs = false; }
-    
+
     if !validInputs {
         log.Println("Someone tried supplying invalid credentials")
         c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
@@ -91,7 +91,7 @@ func registerHandler(c *gin.Context) {
     db.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE name=?)", username).Scan(&usernameExists)
     db.QueryRow("SELECT EXISTS (SELECT 1 FROM users WHERE mail=?)", mail).Scan(&mailExists)
 
-    templValues := gin.H{"UsernameError": usernameExists, "MailError": mailExists, "PasswordError": false}
+    templValues := gin.H{"UsernameError": usernameExists, "MailError": mailExists, "OldUser": username, "OldMail": mail};
     if usernameExists || mailExists {
         c.HTML(http.StatusConflict, "login.html", templValues)
         return

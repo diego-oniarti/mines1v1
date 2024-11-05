@@ -56,8 +56,10 @@
                             </table>
                             <input type="submit" value="invia">
                         </form>
-                        <div id="register_error_box" class="error_box hidden">
+                        <div id="register_error_box" class="error_box {{if not .UsernameError}} {{if not .MailError}}hidden{{end}}{{end}}">
                             <p id="register_error_p">
+                            {{if .UsernameError}}- Nome "{{.OldUser}}" già preso<br>{{end}}
+                            {{if .MailError}}- Mail "{{.OldMail}}" già in uso{{end}}
                             </p>
                         </div>
                         <br/>
