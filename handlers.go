@@ -4,14 +4,15 @@ import (
 	"database/sql"
 	"fmt"
 	"html/template"
-	"io"
 	"log"
 	"math/rand"
 	"net/http"
 	"net/smtp"
 	"os"
+	"regexp"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
@@ -60,19 +61,23 @@ func loginHandler(c *gin.Context) {
 }
 
 func registerHandler(c *gin.Context) {
-    username := c.PostForm("username")
-    mail := c.PostForm("mail")
-    password := c.PostForm("password")
+    username := strings.TrimSpace(c.PostForm("username"));
+    mail := strings.TrimSpace(c.PostForm("mail"));
+    password := strings.TrimSpace(c.PostForm("password"));
 
-    var imageData []byte
-    image, _, err := c.Request.FormFile("image")
-    if err == nil {
-        defer image.Close()
-        imageData, err = io.ReadAll(image)
-        if err != nil {
-            c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error reading image file"})
-            return
-        }
+    validInputs := true;
+    if utf8.RuneCountInString(username)<1 { validInputs = false; }
+    if utf8.RuneCountInString(password)<1 { validInputs = false; }
+    if m, err := regexp.MatchString(".+@.+\\..+", mail); !m || err!=nil { validInputs = false; }
+    if m, err := regexp.MatchString("[_!?(){}#$%^&*.,+\\[\\]=+\"']", password); !m || err!=nil { validInputs = false; }
+    if m, err := regexp.MatchString("[a-z]", password); !m || err!=nil { validInputs = false; }
+    if m, err := regexp.MatchString("[A-Z]", password); !m || err!=nil { validInputs = false; }
+    if m, err := regexp.MatchString("[0-9]", password); !m || err!=nil { validInputs = false; }
+    
+    if !validInputs {
+        log.Println("Someone tried supplying invalid credentials")
+        c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
+        return;
     }
 
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -96,8 +101,8 @@ func registerHandler(c *gin.Context) {
 
     send_mail(mail, code, username);
 
-    _, err = db.Exec("INSERT INTO users (name, image, psw, mail, confirmed, confirm_key) VALUES (?, ?, ?, ?, false, ?)",
-        username, imageData, hashedPassword, mail, code)
+    _, err = db.Exec("INSERT INTO users (name, psw, mail, confirmed, confirm_key) VALUES (?, ?, ?, false, ?)",
+        username, hashedPassword, mail, code)
     if err != nil {
         log.Println("Database error during registration:", err)
         c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
@@ -157,8 +162,6 @@ func send_mail(mail, code, name string) {
         log.Println(err);
         return;
     }
-
-    fmt.Println(builder.String())
 
     msg := "From: " + from + "\n" +
         "To: " + mail + "\n" +

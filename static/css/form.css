@@ -30,3 +30,18 @@ input:hover, input:focus {
     border-radius: 0px;
     outline: none;
 }
+
+.error_box {
+    border: 3px solid #af0028;
+    border-radius: 1rem;
+    background-color: rgba(255,0,0,0.3);
+    padding: 10px;
+}
+.error_box p {
+    margin: 0px;
+    color: #410000;
+    font-weight: bold;
+}
+.dark .error_box p {
+    color: #ffb0b0;
+}

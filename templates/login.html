@@ -10,26 +10,31 @@
                     <div class="flex collapseButton"><h1>Accedi</h1> <div class="V"></div></div>
                     <div class="hr"></div>
                     <div class="section centered">
-                        <form action="#" enctype="multipart/form-data" method="POST">
+                        <form action="#" onsubmit="return validaLogin(this)" enctype="multipart/form-data" method="POST">
                             <table>
                                 <tr>
-                                    <td><span>mail</span></td>
+                                    <td><span>Mail</span></td>
                                     <td><input name="mail" {{if .LoginError}} class="wrong" {{end}}> </td>
                                 </tr>
                                 <tr>
-                                    <td><span>password</span></td>
+                                    <td><span>Password</span></td>
                                     <td><input name="password" type="password" {{if .LoginError}} class="wrong" {{end}}> </td>
                                 </tr>
                             </table>
                             <input type="submit" value="invia">
                         </form>
+                        <div id="login_error_box" class="error_box hidden">
+                            <p id="login_error_p">
+                            </p>
+                        </div>
+                        <br/>
                     </div>
                 </div>
                 <div class="box">
                     <div class="flex collapseButton"><h1>Non Hai Un Account?</h1> <div class="V"></div></div>
                     <div class="hr"></div>
                     <div class="section centered">
-                        <form action="/register" enctype="multipart/form-data" method="POST">
+                        <form action="/register" onsubmit="return validaRegistrazione(this)" enctype="multipart/form-data" method="POST">
                             <table>
                                 <tr>
                                     <td><span>Username</span></td>
@@ -45,16 +50,22 @@
                                 </tr>
                                 <tr>
                                     <td><span>Conferma Password</span></td>
-                                    <td><input name="password-confirm" type="password" {{if .Password_error}} class="wrong" {{end}}> </td>
+                                    <td><input name="password_confirm" type="password" {{if .Password_error}} class="wrong" {{end}}> </td>
                                 </tr>
                                 <!--<input name="image" type="file"> <br/>-->
                             </table>
                             <input type="submit" value="invia">
                         </form>
+                        <div id="register_error_box" class="error_box hidden">
+                            <p id="register_error_p">
+                            </p>
+                        </div>
+                        <br/>
                     </div>
                 </div>
             </div>
         </div>
         {{template "footer" .}}
+        <script src="/static/scripts/form.js"></script>
     </body>
 </html>

@@ -29,7 +29,6 @@ func init() {
     CREATE TABLE users (
         user_id integer primary key autoincrement, 
         name string, 
-        image bytea, 
         psw string, 
         mail string, 
         confirmed boolean,

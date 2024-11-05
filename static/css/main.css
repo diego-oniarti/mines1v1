@@ -30,7 +30,10 @@ body {
     background-color: var(--shade8);
 }
 
-p, h1, h2, h3, li, a, b, span, label, code, figcaption, input {
+p, h2, h3, li, a, b, span, label, code, figcaption, input {
+    color: var(--shade2);
+}
+h1 {
     color: var(--shade1);
 }
 .dark p, .dark h1, .dark h2, .dark h3, .dark li, .dark a, .dark b, .dark span, .dark label, .dark code, .dark figcaption {
@@ -169,6 +172,7 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
 }
 #footer p {
     color: var(--shade8);
+    margin-top: 8;
 }
 .dark #footer p {
     color: var(--shade1);
@@ -271,6 +275,9 @@ img {
     background-color: var(--shade8);
 }
 
+.hidden {
+    display: none;
+}
 
 /* PALETTE */
 #palette {
