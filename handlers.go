@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -41,8 +42,8 @@ func loginHandler(c *gin.Context) {
     password := c.PostForm("password")
 
     var user User
-    err := db.QueryRow("SELECT name, psw FROM users WHERE mail=? AND confirmed=true", mail).
-        Scan(&user.Username, &user.Psw)
+    err := db.QueryRow("SELECT name, mail, psw FROM users WHERE mail=? AND confirmed=true", mail).
+        Scan(&user.Username, &user.Mail, &user.Psw);
     if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.Psw), []byte(password)) != nil {
         log.Println(err)
         c.HTML(http.StatusUnauthorized, "login.html", gin.H{"LoginError": "Invalid email or password"})
@@ -53,10 +54,7 @@ func loginHandler(c *gin.Context) {
         return
     }
 
-    session, _ := store.Get(c.Request, "session-name")
-    session.Values["authenticated"] = true
-    session.Values["username"] = user.Username
-    session.Save(c.Request, c.Writer)
+    createSession(c, &user);
 
     c.Redirect(http.StatusTemporaryRedirect, "/")
 }
@@ -116,16 +114,22 @@ func verifyHandler(c *gin.Context) {
         log.Println(err)
         c.HTML(http.StatusInternalServerError, "/index", nil);
     }
-    row := db.QueryRow("SELECT name FROM users WHERE confirm_key=?", code);
-    var username string;
-    row.Scan(&username)
+    row := db.QueryRow("SELECT name, mail FROM users WHERE confirm_key=?", code);
+    var user User;
+    row.Scan(&user.Username, &user.Mail);
 
-    session, _ := store.Get(c.Request, "session-name")
-    session.Values["authenticated"] = true
-    session.Values["username"] = username
-    session.Save(c.Request, c.Writer)
+    createSession(c, &user);
 
     c.Redirect(http.StatusPermanentRedirect, "/");
+}
+
+func createSession(c *gin.Context, user *User) *sessions.Session {
+    session, _ := store.Get(c.Request, "session-name");
+    session.Values["authenticated"] = true;
+    session.Values["username"] = user.Username;
+    session.Values["email"] = user.Mail;
+    session.Save(c.Request, c.Writer);
+    return session;
 }
 
 func get_code() string{
