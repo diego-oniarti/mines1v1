@@ -9,6 +9,8 @@ form {
 
 td:first-child {
     text-align: right;
+}
+td {
     font-size: x-large;
 }
 

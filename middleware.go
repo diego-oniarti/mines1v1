@@ -13,6 +13,7 @@ func SessionMiddleware() gin.HandlerFunc {
         if auth, ok := session.Values["authenticated"].(bool); ok && auth {
             c.Set("isAuthenticated", true)
             c.Set("username", session.Values["username"])
+            c.Set("email", session.Values["email"])
         } else {
             c.Set("isAuthenticated", false)
         }
@@ -26,5 +27,25 @@ func SessionMiddleware() gin.HandlerFunc {
 
         // Proceed with the request
         c.Next()
+    }
+}
+
+func addUserDataMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        // Recupera i dati utente, ad esempio da sessione o database
+        username := c.GetString("username") // Supponiamo che l'username sia già nel contesto
+        email := c.GetString("email")       // Supponiamo che l'email sia già nel contesto
+
+        // Aggiungi i dati utente al contesto per renderli disponibili nei template
+        if c.GetBool("isAuthenticated") {
+            c.Set("templateData", gin.H{
+                "username": username,
+                "email":    email,
+            })
+        }else{
+            c.Set("templateData", gin.H{})
+        }
+
+        c.Next() // Continua alla richiesta successiva
     }
 }

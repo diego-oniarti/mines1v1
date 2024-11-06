@@ -20,23 +20,20 @@ import (
 )
 
 func indexHandler(c *gin.Context) {
-    username := c.GetString("username")
-    c.HTML(http.StatusOK, "index.html", gin.H{"username": username})
+    render(c, http.StatusOK, "index.html", nil)
 }
 
 func loginPageHandler(c *gin.Context) {
-    c.HTML(http.StatusOK, "login.html", nil)
+    render(c, http.StatusOK, "login.html", nil)
 }
 
-func profilePageHandler(c *gin.Context) {
-    isAuthenticated := c.GetBool("isAuthenticated")
-    if !isAuthenticated {
+func userPageHandler(c *gin.Context) {
+    if !c.GetBool("isAuthenticated") {
         c.Redirect(http.StatusTemporaryRedirect, "/login")
         return;
     }
-    c.HTML(http.StatusOK, "user.html", nil)
+    render(c, http.StatusOK, "user.html", nil)
 }
-
 
 func loginHandler(c *gin.Context) {
     mail := c.PostForm("mail")
@@ -47,11 +44,11 @@ func loginHandler(c *gin.Context) {
         Scan(&user.Username, &user.Mail, &user.Psw);
     if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.Psw), []byte(password)) != nil {
         log.Println(err)
-        c.HTML(http.StatusUnauthorized, "login.html", gin.H{"LoginError": "Invalid email or password"})
+        render(c, http.StatusUnauthorized, "login.html", nil)
         return
     } else if err != nil {
         log.Println("Database error:", err)
-        c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Internal server error"})
+        render(c, http.StatusInternalServerError, "login.html", nil)
         return
     }
 
@@ -76,14 +73,14 @@ func registerHandler(c *gin.Context) {
 
     if !validInputs {
         log.Println("Someone tried supplying invalid credentials")
-        c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
+        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
         return;
     }
 
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
         log.Println("Error hashing password:", err)
-        c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
+        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
         return
     }
 
@@ -93,7 +90,7 @@ func registerHandler(c *gin.Context) {
 
     templValues := gin.H{"UsernameError": usernameExists, "MailError": mailExists, "OldUser": username, "OldMail": mail};
     if usernameExists || mailExists {
-        c.HTML(http.StatusConflict, "login.html", templValues)
+        render(c, http.StatusConflict, "login.html", templValues)
         return
     }
 
@@ -105,11 +102,11 @@ func registerHandler(c *gin.Context) {
         username, hashedPassword, mail, code)
     if err != nil {
         log.Println("Database error during registration:", err)
-        c.HTML(http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
+        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
         return
     }
 
-    c.HTML(http.StatusOK, "registration_complete.html", nil);
+    render(c, http.StatusOK, "registration_complete.html", nil);
 }
 
 func verifyHandler(c *gin.Context) {
@@ -117,7 +114,7 @@ func verifyHandler(c *gin.Context) {
     _, err := db.Exec("UPDATE users SET confirmed=true WHERE confirm_key=?", code);
     if err!=nil {
         log.Println(err)
-        c.HTML(http.StatusInternalServerError, "/index", nil);
+        render(c, http.StatusInternalServerError, "/index", nil);
     }
     row := db.QueryRow("SELECT name, mail FROM users WHERE confirm_key=?", code);
     var user User;
@@ -126,6 +123,21 @@ func verifyHandler(c *gin.Context) {
     createSession(c, &user);
 
     c.Redirect(http.StatusPermanentRedirect, "/");
+}
+
+func logoutHandler(c *gin.Context) {
+    session, _ := store.Get(c.Request, "session-name");
+    session.Values["authenticated"] = false;
+    session.Save(c.Request, c.Writer);
+    c.Redirect(http.StatusTemporaryRedirect, "/");
+}
+
+func deleteAccountHandler(c *gin.Context) {
+    session, _ := store.Get(c.Request, "session-name");
+    db.Exec("DELETE FROM users WHERE mail=?", session.Values["email"]);
+    session.Values["authenticated"] = false;
+    session.Save(c.Request, c.Writer);
+    c.Redirect(http.StatusTemporaryRedirect, "/");
 }
 
 func createSession(c *gin.Context, user *User) *sessions.Session {
@@ -140,6 +152,7 @@ func createSession(c *gin.Context, user *User) *sessions.Session {
 func get_code() string{
     const dict = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_0123456789";
     var b strings.Builder;
+    fmt.Fprint(&b, "code_")
     rng := rand.New(rand.NewSource(time.Now().UnixNano()));
     for i:=0; i<20; i++ {
         fmt.Fprint(&b,dict[rng.Int()%len(dict)]);
@@ -181,3 +194,17 @@ func send_mail(mail, code, name string) {
 
     log.Print("Email sent")
 }
+
+func render(c *gin.Context, code int, templateName string, data gin.H) {
+    // Unisci i dati globali con quelli specifici dell'handler
+    if data==nil {
+        data = gin.H{};
+    }
+    globalData := c.MustGet("templateData").(gin.H)
+    for k, v := range globalData {
+        data[k] = v
+        fmt.Println(k,v)
+    }
+    c.HTML(code, templateName, data)
+}
+

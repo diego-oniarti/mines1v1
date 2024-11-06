@@ -23,6 +23,7 @@ func main() {
     r := gin.Default()
     r.LoadHTMLGlob("templates/*")
     r.Use(SessionMiddleware())
+    r.Use(addUserDataMiddleware())
 
     r.Static("/static", "./static")
 
@@ -32,7 +33,9 @@ func main() {
     r.POST("/login", loginHandler)
     r.POST("/register", registerHandler)
     r.POST("/verify", verifyHandler)
-    r.GET("/user", profilePageHandler)
+    r.GET("/user", userPageHandler)
+    r.POST("/logout", logoutHandler)
+    r.POST("/deleteAccount", deleteAccountHandler)
 
     r.Run(":2357")
 }

@@ -4,14 +4,25 @@
     <body class="dark">
         {{template "navbar" .}}
         <div id="mainContainer">
-            <h1 id="titoloPagina">TITOLO PAGINA</h1>
+            <h1 id="titoloPagina">Pagina Utente</h1>
 
             <div class="boxes">
                 <div class="box">
-                    <div class="flex collapseButton"><h1>Titolo Box</h1> <div class="V"></div></div>
-                    <div class="hr"></div>
-                    <div class="section">
-
+                    <div class="section centered">
+                        <table>
+                            <tr>
+                                <td><span>mail:</span></td>
+                                <td><span>{{.email}}</span></td>
+                            </tr>
+                            <tr>
+                                <td><span>username:</span></td>
+                                <td><span>{{.username}}</span></td>
+                            </tr>
+                            <tr>
+                                <td><form method="post" action="/logout" onsubmit="return confirm('Vuoi uscire?')"><input type="submit" value="logout"></form></td>
+                                <td><form method="post" action="/deleteAccount" onsubmit="return confirm('Sei sicuro?')"><input type="submit" value="Delete account"></form></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
