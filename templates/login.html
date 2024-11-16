@@ -11,16 +11,11 @@
                     <div class="hr"></div>
                     <div class="section centered">
                         <form action="#" onsubmit="return validaLogin(this)" enctype="multipart/form-data" method="POST">
-                            <table>
-                                <tr>
-                                    <td><span>Mail</span></td>
-                                    <td><input name="mail" type="email" {{if .LoginError}} class="wrong" {{end}}> </td>
-                                </tr>
-                                <tr>
-                                    <td><span>Password</span></td>
-                                    <td><input name="password" type="password" {{if .LoginError}} class="wrong" {{end}}> </td>
-                                </tr>
-                            </table>
+                            <div class="form_fields">
+                                <input placeholder="email" name="mail" type="email" {{if .LoginError}} class="wrong" {{end}}>
+                                <input placeholder="password" name="password" type="password" {{if .LoginError}} class="wrong" {{end}}> 
+                            </div>
+                            <br>
                             <input type="submit" value="invia">
                         </form>
                         <div id="login_error_box" class="error_box hidden">
@@ -35,25 +30,14 @@
                     <div class="hr"></div>
                     <div class="section centered">
                         <form action="/register" onsubmit="return validaRegistrazione(this)" enctype="multipart/form-data" method="POST">
-                            <table>
-                                <tr>
-                                    <td><span>Username</span></td>
-                                    <td><input name="username" {{if .Username_error}} class="wrong" {{end}}></td>
-                                </tr>
-                                <tr>
-                                    <td><span>Mail</span></td>
-                                    <td><input name="mail" type="email" {{if .Mail_error}} class="wrong" {{end}}></td>
-                                </tr>
-                                <tr>
-                                    <td><span>Password</span></td>
-                                    <td><input name="password" type="password" {{if .Password_error}} class="wrong" {{end}}></td>
-                                </tr>
-                                <tr>
-                                    <td><span>Conferma Password</span></td>
-                                    <td><input name="password_confirm" type="password" {{if .Password_error}} class="wrong" {{end}}> </td>
-                                </tr>
+                            <div class="form_fields">
+                                <input placeholder="username" name="username" {{if .Username_error}} class="wrong" {{end}}>
+                                <input placeholder="email" name="mail" type="email" {{if .Mail_error}} class="wrong" {{end}}>
+                                <input placeholder="password" name="password" type="password" {{if .Password_error}} class="wrong" {{end}}>
+                                <input placeholder="conferma password" name="password_confirm" type="password" {{if .Password_error}} class="wrong" {{end}}>
                                 <!--<input name="image" type="file"> <br/>-->
-                            </table>
+                            </div>
+                            <br>
                             <input type="submit" value="invia">
                         </form>
                         <div id="register_error_box" class="error_box {{if not .UsernameError}} {{if not .MailError}}hidden{{end}}{{end}}">

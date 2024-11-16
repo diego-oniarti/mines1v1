@@ -1,10 +1,11 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/gorilla/sessions"
-    "github.com/joho/godotenv"
-    "os"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/sessions"
+	"github.com/joho/godotenv"
 )
 
 var store *sessions.CookieStore
@@ -15,7 +16,7 @@ func main() {
         panic("Error loading .env file")
     }
 
-    defer db.Close();
+    defer db.Close()
 
     sessionKey := []byte(os.Getenv("SESSION_SECRET"))
     store = sessions.NewCookieStore(sessionKey)
@@ -36,6 +37,9 @@ func main() {
     r.GET("/user", userPageHandler)
     r.POST("/logout", logoutHandler)
     r.POST("/deleteAccount", deleteAccountHandler)
+    r.GET("/lobby", lobbyHandle)
+
+    r.GET("/wsSinglePlayer", wsHandler)
 
     r.Run(":2357")
 }

@@ -208,3 +208,7 @@ func render(c *gin.Context, code int, templateName string, data gin.H) {
     c.HTML(code, templateName, data)
 }
 
+func lobbyHandle(c *gin.Context) {
+    render(c, http.StatusOK, "lobby.html", nil)
+}
+

@@ -16,21 +16,95 @@ td {
 
 input {
     border: 2px solid var(--shade1);
+    background-color: var(--shade7);
     border-radius: 20px;
     font-size: large;
     padding: 5px;
+    transition: border-radius 125ms ease-in-out;
 }
 input:focus-visible, input:focus {
     border: 2px solid var(--shade1);
 }
 
-input {
+::placeholder {
+    color: var(--shade6);
+}
+
+.dark input {
     background-color: var(--shade8);
-    transition: border-radius 125ms ease-in-out;
+}
+input[type=submit] {
+    border: 2px solid var(--shade8);
+    background-color: var(--shade1);
+    color: var(--shade8);
+}
+.dark input[type=submit] {
+    border: 2px solid var(--shade1);
+    background-color: var(--shade8);
+    color: var(--shade1);
 }
 input:hover, input:focus {
     border-radius: 0px;
     outline: none;
+}
+
+input[type=number] {
+    width: 4em;
+}
+.form_fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-end;
+    margin-bottom: 1px;
+}
+
+.toggle {
+    display: inline-block;
+    height: 31px;
+    width: 60px;
+    border: 2px solid var(--shade1);
+    vertical-align: middle;
+    border-radius: 1rem;
+    position: relative;
+    background-color: var(--shade7);
+    transition: border-radius 125ms ease-in-out;
+}
+.toggle:hover {
+    border-radius: 0;
+}
+.toggle:hover .toggle_nob {
+    border-radius: 0;
+}
+.toggle input {
+    display: none;
+}
+.toggle_nob {
+    position: absolute;
+    top: 0;
+    left: -1px;
+    background-color: var(--shade1);
+    height: 27px;
+    width: 27px;
+    border-radius: 50%;
+    transition: left 200ms cubic-bezier(0.89,-0.45, 0.63, 1.37), border-radius 125ms ease-in-out;
+}
+.toggled .toggle_nob {
+    left: 30px;
+}
+
+.dark .toggle {
+    border: 2px solid var(--shade8);
+    background-color: var(--shade2);
+}
+.dark .toggle_nob {
+    background-color: var(--shade8);
+}
+.dark .toggled {
+    background-color: var(--shade2);
+}
+.toggled {
+    background-color: var(--shade7);
 }
 
 .error_box {

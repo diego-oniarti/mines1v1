@@ -1,3 +1,4 @@
+/*
 :root {
     --shade1: #0097af;
     --shade2: #007284;
@@ -6,6 +7,19 @@
     --shade5: #36647a;
     --shade6: #6087b7;
     --shade7: #dcedff;
+    --shade8: #ffffff;
+}
+*/
+
+:root {
+    --shade1: #af0091;
+    --shade2: #840048;
+    --shade3: #2d1218;
+    --shade4: #481e3b;
+    --shade5: #7a3655;
+    --shade6: #b760a0;
+    /*--shade7: #ffdcee;*/
+    --shade7: #ffedf6;
     --shade8: #ffffff;
 }
 
@@ -93,7 +107,7 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
     border-radius: 1rem;
     /*box-shadow: 2px 2px 5px var(--shade1);*/
     box-shadow: 0px 0px 0px 3px var(--shade1);
-    transition: box-shadow 200ms ease-in-out
+    /*transition: box-shadow 200ms ease-in-out*/
 }
 .dark .box {
     box-shadow: 0px 0px 0px 3px var(--shade8);
@@ -134,7 +148,7 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
     text-decoration: none;
     color: var(--shade8);
     background-color: transparent;
-    transition: all 200ms ease-in-out;
+    /*transition: all 200ms ease-in-out;*/
     cursor: pointer;
 }
 
@@ -172,7 +186,7 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
 }
 #footer p {
     color: var(--shade8);
-    margin-top: 8;
+    margin-top: 8px;
 }
 .dark #footer p {
     color: var(--shade1);
@@ -248,7 +262,7 @@ img {
     align-items: flex-end;
 }
 .collapseButton .V {
-    transition: color 200ms ease-in-out, background-color 200ms ease-in-out, transform 300ms ease-in-out ; /*cubic-bezier(0.69,-0.65, 0.62, 1.22)*/
+    /*transition: color 200ms ease-in-out, background-color 200ms ease-in-out, transform 300ms ease-in-out ; /*cubic-bezier(0.69,-0.65, 0.62, 1.22)*/
 }
 .flipped {
     transform: rotateZ(90deg);
@@ -261,6 +275,10 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+.horizontal {
+    display: flex;
+    flex-direction: row;
 }
 
 .V {
