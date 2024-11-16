@@ -1,4 +1,4 @@
-package main;
+package gamemodes;
 
 type Stack[T any] struct {
     items []T;

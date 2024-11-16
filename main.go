@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
+    "github.com/diego-oniarti/mines1v1/gamemodes"
 )
 
 var store *sessions.CookieStore
@@ -39,8 +40,8 @@ func main() {
     r.POST("/deleteAccount", deleteAccountHandler)
     r.GET("/lobby", lobbyHandle)
 
-    r.GET("/singleplayer", singlePlayerHandler)
-    r.GET("/wsSinglePlayer", wsHandler)
+    r.GET("/singlePlayer", gamemodes.SinglePlayerPage)
+    r.GET("/wsSinglePlayer", gamemodes.SinglePlayerWs)
 
     r.Run(":2357")
 }

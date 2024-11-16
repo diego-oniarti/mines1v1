@@ -10,7 +10,6 @@ import (
 	"net/smtp"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -18,14 +17,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
+    "github.com/diego-oniarti/mines1v1/shared"
 )
 
 func indexHandler(c *gin.Context) {
-    render(c, http.StatusOK, "index.html", nil)
+    shared.Render(c, http.StatusOK, "index.html", nil)
 }
 
 func loginPageHandler(c *gin.Context) {
-    render(c, http.StatusOK, "login.html", nil)
+    shared.Render(c, http.StatusOK, "login.html", nil)
 }
 
 func userPageHandler(c *gin.Context) {
@@ -33,7 +33,7 @@ func userPageHandler(c *gin.Context) {
         c.Redirect(http.StatusTemporaryRedirect, "/login")
         return;
     }
-    render(c, http.StatusOK, "user.html", nil)
+    shared.Render(c, http.StatusOK, "user.html", nil)
 }
 
 func loginHandler(c *gin.Context) {
@@ -45,11 +45,11 @@ func loginHandler(c *gin.Context) {
         Scan(&user.Username, &user.Mail, &user.Psw);
     if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.Psw), []byte(password)) != nil {
         log.Println(err)
-        render(c, http.StatusUnauthorized, "login.html", nil)
+        shared.Render(c, http.StatusUnauthorized, "login.html", nil)
         return
     } else if err != nil {
         log.Println("Database error:", err)
-        render(c, http.StatusInternalServerError, "login.html", nil)
+        shared.Render(c, http.StatusInternalServerError, "login.html", nil)
         return
     }
 
@@ -74,14 +74,14 @@ func registerHandler(c *gin.Context) {
 
     if !validInputs {
         log.Println("Someone tried supplying invalid credentials")
-        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
+        shared.Render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
         return;
     }
 
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
         log.Println("Error hashing password:", err)
-        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
+        shared.Render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error processing registration"})
         return
     }
 
@@ -91,7 +91,7 @@ func registerHandler(c *gin.Context) {
 
     templValues := gin.H{"UsernameError": usernameExists, "MailError": mailExists, "OldUser": username, "OldMail": mail};
     if usernameExists || mailExists {
-        render(c, http.StatusConflict, "login.html", templValues)
+        shared.Render(c, http.StatusConflict, "login.html", templValues)
         return
     }
 
@@ -103,11 +103,11 @@ func registerHandler(c *gin.Context) {
         username, hashedPassword, mail, code)
     if err != nil {
         log.Println("Database error during registration:", err)
-        render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
+        shared.Render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
         return
     }
 
-    render(c, http.StatusOK, "registration_complete.html", nil);
+    shared.Render(c, http.StatusOK, "registration_complete.html", nil);
 }
 
 func verifyHandler(c *gin.Context) {
@@ -115,7 +115,7 @@ func verifyHandler(c *gin.Context) {
     _, err := db.Exec("UPDATE users SET confirmed=true WHERE confirm_key=?", code);
     if err!=nil {
         log.Println(err)
-        render(c, http.StatusInternalServerError, "/index", nil);
+        shared.Render(c, http.StatusInternalServerError, "/index", nil);
     }
     row := db.QueryRow("SELECT name, mail FROM users WHERE confirm_key=?", code);
     var user User;
@@ -196,39 +196,6 @@ func send_mail(mail, code, name string) {
     log.Print("Email sent")
 }
 
-func render(c *gin.Context, code int, templateName string, data gin.H) {
-    // Unisci i dati globali con quelli specifici dell'handler
-    if data==nil {
-        data = gin.H{};
-    }
-    globalData := c.MustGet("templateData").(gin.H)
-    for k, v := range globalData {
-        data[k] = v
-        fmt.Println(k,v)
-    }
-    c.HTML(code, templateName, data)
-}
-
 func lobbyHandle(c *gin.Context) {
-    render(c, http.StatusOK, "lobby.html", nil)
-}
-func singlePlayerHandler(c *gin.Context) {
-    var width, height, bombs, tempo int;
-    valid := true;
-    tmp := func(name, def string) (int) {
-        v,e := strconv.Atoi(c.DefaultQuery(name, def))
-        if e!=nil || v<=0 { valid=false; return -1; }
-        return v;
-    }
-    width = tmp("width" , "18")
-    height = tmp("height", "14")
-    bombs = tmp("bombs" , "40")
-    timed := c.DefaultQuery("timed" , "off")
-    tempo = tmp("tempo" , "3000")
-    if !valid {
-        c.Status(400);
-        return;
-    }
-    
-    render(c, http.StatusOK, "singlePlayer.html", nil);
+    shared.Render(c, http.StatusOK, "lobby.html", nil)
 }
