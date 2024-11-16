@@ -39,6 +39,7 @@ func main() {
     r.POST("/deleteAccount", deleteAccountHandler)
     r.GET("/lobby", lobbyHandle)
 
+    r.GET("/singleplayer", singlePlayerHandler)
     r.GET("/wsSinglePlayer", wsHandler)
 
     r.Run(":2357")

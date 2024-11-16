@@ -49,7 +49,7 @@ window.addEventListener('resize', ()=>{
 })
 
 for (let bottone of document.getElementsByClassName('collapseButton')) {    
-    bottone.addEventListener('click',e=>{
+    bottone.addEventListener('click', ()=>{
         bottone.children[1].classList.toggle('flipped')
         for (element of bottone.parentElement.children) {
             if (element.style.backgroundColor=='transparent') 
@@ -69,7 +69,7 @@ for (let bottone of document.getElementsByClassName('collapseButton')) {
 }
 
 for (let toggle of document.getElementsByClassName("toggle")) {
-    toggle.addEventListener("click", e=>{
+    toggle.addEventListener("click", ()=>{
         toggle.classList.toggle("toggled");
         for (let child of toggle.children) {
             if (child.tagName==="INPUT") {

@@ -10,6 +10,7 @@ import (
 	"net/smtp"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -211,4 +212,23 @@ func render(c *gin.Context, code int, templateName string, data gin.H) {
 func lobbyHandle(c *gin.Context) {
     render(c, http.StatusOK, "lobby.html", nil)
 }
-
+func singlePlayerHandler(c *gin.Context) {
+    var width, height, bombs, tempo int;
+    valid := true;
+    tmp := func(name, def string) (int) {
+        v,e := strconv.Atoi(c.DefaultQuery(name, def))
+        if e!=nil || v<=0 { valid=false; return -1; }
+        return v;
+    }
+    width = tmp("width" , "18")
+    height = tmp("height", "14")
+    bombs = tmp("bombs" , "40")
+    timed := c.DefaultQuery("timed" , "off")
+    tempo = tmp("tempo" , "3000")
+    if !valid {
+        c.Status(400);
+        return;
+    }
+    
+    render(c, http.StatusOK, "singlePlayer.html", nil);
+}
