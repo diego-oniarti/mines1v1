@@ -68,6 +68,5 @@ type User struct {
     Username  string
     Mail      string
     Psw       string
-    Confirmed bool
 }
 

@@ -26,7 +26,6 @@ func SessionMiddleware() gin.HandlerFunc {
         //     return
         // }
 
-        // Proceed with the request
         c.Next()
     }
 }

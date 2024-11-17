@@ -49,6 +49,7 @@ func loginHandler(c *gin.Context) {
         shared.Render(c, http.StatusInternalServerError, "login.html", nil)
         return
     }
+    log.Println("logging in user", user);
 
     createSession(c, &user);
 
@@ -139,6 +140,7 @@ func deleteAccountHandler(c *gin.Context) {
 }
 
 func createSession(c *gin.Context, user *User) *sessions.Session {
+    log.Println("clreating session for", user)
     session, _ := shared.Store.Get(c.Request, "session-name");
     session.Values["authenticated"] = true;
     session.Values["username"] = user.Username;
