@@ -25,6 +25,9 @@ func init() {
     games_params = make(map[string]GameParams);
 }
 
+func bytesToCoords(b []byte) (uint16, uint16) {
+    return binary.LittleEndian.Uint16(b[0:2]), binary.LittleEndian.Uint16(b[2:4])
+}
 func SinglePlayerWs(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -47,11 +50,12 @@ func SinglePlayerWs(c *gin.Context) {
 	// }
 
 	messageType, game_id, err := conn.ReadMessage()
-	if err != nil || messageType!=1 {
-        return
-	}
+	if err != nil || messageType!=1 { return }
+
     game_id_str := string(game_id[:])
-    game_params := games_params[game_id_str]
+    game_params, ok := games_params[game_id_str]
+    if !ok { return }
+    delete(games_params, game_id_str)
 
     vals := []uint16{
         game_params.width,
@@ -64,6 +68,12 @@ func SinglePlayerWs(c *gin.Context) {
     buffer := new(bytes.Buffer);
     binary.Write(buffer, binary.BigEndian, vals);
     err = conn.WriteMessage(2, buffer.Bytes())
+
+	messageType, firstMove, err := conn.ReadMessage()
+	if err != nil || messageType!=2 { return }
+
+    x,y := bytesToCoords(firstMove)
+    log.Println(x,y)
 }
 
 func SinglePlayerPage(c *gin.Context) {
