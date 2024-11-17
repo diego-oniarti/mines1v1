@@ -25,31 +25,35 @@ type Game struct {
     state GameState;
     bomb_count int;
     flag_count int;
+    tempo int
 }
 
-func NewGame(width int, height int, prob float32) *Game {
+func NewGame(width int, height int, n_bombe int, tempo int) *Game {
     ret := Game {
         celle: make([][]Cella, height),
         state: Running,
-        bomb_count: 0,
+        bomb_count: n_bombe,
         flag_count: 0,
+        tempo: tempo,
     }
 
     r := rand.New(rand.NewSource(time.Now().UnixNano()));
     for y := range ret.celle {
         ret.celle[y] = make([]Cella, width);
         for x := range ret.celle[y] {
-            bomb := r.Float32() < prob;
-            if bomb {
-                ret.bomb_count++;
-            }
             ret.celle[y][x] = Cella{
                 is_flagged: false,
-                is_bomb: bomb,
+                is_bomb: false,
                 label: 0,
                 is_hidden: true,
             };
         }
+    }
+    for i:=0; i<n_bombe; i++ {
+        x := r.Int() % (width);
+        y := r.Int() % (height);
+        if ret.celle[y][x].is_bomb {i--; continue}
+        ret.celle[y][x].is_bomb=true;
     }
 
     for y := range ret.celle {

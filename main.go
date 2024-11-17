@@ -1,15 +1,11 @@
 package main
 
 import (
-	"os"
-
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"github.com/joho/godotenv"
     "github.com/diego-oniarti/mines1v1/gamemodes"
 )
 
-var store *sessions.CookieStore
 
 func main() {
     err := godotenv.Load(".env")
@@ -18,9 +14,6 @@ func main() {
     }
 
     defer db.Close()
-
-    sessionKey := []byte(os.Getenv("SESSION_SECRET"))
-    store = sessions.NewCookieStore(sessionKey)
 
     r := gin.Default()
     r.LoadHTMLGlob("templates/*")

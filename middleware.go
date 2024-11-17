@@ -1,13 +1,14 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
+	"github.com/diego-oniarti/mines1v1/shared"
+	"github.com/gin-gonic/gin"
 )
 
 // SessionMiddleware checks for an active session and applies it only where required
 func SessionMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
-        session, _ := store.Get(c.Request, "session-name")
+        session, _ := shared.Store.Get(c.Request, "session-name")
 
         // Set authentication status in the context
         if auth, ok := session.Values["authenticated"].(bool); ok && auth {

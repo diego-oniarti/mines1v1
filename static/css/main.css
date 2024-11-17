@@ -119,6 +119,9 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
     flex-direction: column;
     row-gap: 20px;
 }
+.box.clear {
+    box-shadow: unset;
+}
 
 /* NAVBAR */
 #navBar {

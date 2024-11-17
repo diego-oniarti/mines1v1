@@ -2,22 +2,19 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"html/template"
 	"log"
-	"math/rand"
 	"net/http"
 	"net/smtp"
 	"os"
 	"regexp"
 	"strings"
-	"time"
 	"unicode/utf8"
 
+	"github.com/diego-oniarti/mines1v1/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/sessions"
 	"golang.org/x/crypto/bcrypt"
-    "github.com/diego-oniarti/mines1v1/shared"
 )
 
 func indexHandler(c *gin.Context) {
@@ -95,7 +92,7 @@ func registerHandler(c *gin.Context) {
         return
     }
 
-    code := get_code();
+    code := shared.RandomString(20, "code_");
 
     send_mail(mail, code, username);
 
@@ -127,14 +124,14 @@ func verifyHandler(c *gin.Context) {
 }
 
 func logoutHandler(c *gin.Context) {
-    session, _ := store.Get(c.Request, "session-name");
+    session, _ := shared.Store.Get(c.Request, "session-name");
     session.Values["authenticated"] = false;
     session.Save(c.Request, c.Writer);
     c.Redirect(http.StatusTemporaryRedirect, "/");
 }
 
 func deleteAccountHandler(c *gin.Context) {
-    session, _ := store.Get(c.Request, "session-name");
+    session, _ := shared.Store.Get(c.Request, "session-name");
     db.Exec("DELETE FROM users WHERE mail=?", session.Values["email"]);
     session.Values["authenticated"] = false;
     session.Save(c.Request, c.Writer);
@@ -142,23 +139,12 @@ func deleteAccountHandler(c *gin.Context) {
 }
 
 func createSession(c *gin.Context, user *User) *sessions.Session {
-    session, _ := store.Get(c.Request, "session-name");
+    session, _ := shared.Store.Get(c.Request, "session-name");
     session.Values["authenticated"] = true;
     session.Values["username"] = user.Username;
     session.Values["email"] = user.Mail;
     session.Save(c.Request, c.Writer);
     return session;
-}
-
-func get_code() string{
-    const dict = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_0123456789";
-    var b strings.Builder;
-    fmt.Fprint(&b, "code_")
-    rng := rand.New(rand.NewSource(time.Now().UnixNano()));
-    for i:=0; i<20; i++ {
-        fmt.Fprint(&b,dict[rng.Int()%len(dict)]);
-    }
-    return b.String();
 }
 
 func send_mail(mail, code, name string) {
