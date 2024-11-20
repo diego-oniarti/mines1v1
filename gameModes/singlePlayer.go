@@ -25,8 +25,12 @@ func init() {
     games_params = make(map[string]GameParams);
 }
 
-func bytesToCoords(b []byte) (uint16, uint16) {
-    return binary.LittleEndian.Uint16(b[0:2]), binary.LittleEndian.Uint16(b[2:4])
+func bytesToMove(b []byte) (uint16, uint16, bool) {
+    x := binary.BigEndian.Uint16(b[0:2])
+    y := binary.BigEndian.Uint16(b[2:4])
+    flag := b[4]>0
+
+    return x,y,flag
 }
 func SinglePlayerWs(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -37,18 +41,6 @@ func SinglePlayerWs(c *gin.Context) {
 	}
 	defer conn.Close()
 
-	// for {
-	// 	messageType, message, err := conn.ReadMessage()
-	// 	if err != nil {
-	// 		break
-	// 	}
-	// 	// Echo di ritorno al client
-	// 	err = conn.WriteMessage(messageType, message)
-	// 	if err != nil {
-	// 		break
-	// 	}
-	// }
-
 	messageType, game_id, err := conn.ReadMessage()
 	if err != nil || messageType!=1 { return }
 
@@ -57,23 +49,34 @@ func SinglePlayerWs(c *gin.Context) {
     if !ok { return }
     delete(games_params, game_id_str)
 
-    vals := []uint16{
+
+    err = conn.WriteMessage(2, arrToBuff([]uint16{
         game_params.width,
         game_params.height,
         game_params.bombs,
         game_params.tempo,
-    };
-    log.Println("vals: ", vals)
+    }))
 
-    buffer := new(bytes.Buffer);
-    binary.Write(buffer, binary.BigEndian, vals);
-    err = conn.WriteMessage(2, buffer.Bytes())
+    game := NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo)
 
-	messageType, firstMove, err := conn.ReadMessage()
-	if err != nil || messageType!=2 { return }
+    for game.state==Running {
+        messageType, move, err := conn.ReadMessage()
+        if err != nil || messageType!=2 { return }
+        x,y,flag := bytesToMove(move)
+        log.Println(x,y,flag)
 
-    x,y := bytesToCoords(firstMove)
-    log.Println(x,y)
+        if flag {
+            game.flag(x, y)
+        }else{
+            game.click(x, y)
+        }
+    }
+}
+
+func arrToBuff(arr []uint16) []byte {
+    buffer := new(bytes.Buffer)
+    binary.Write(buffer, binary.BigEndian, arr)
+    return buffer.Bytes()
 }
 
 func SinglePlayerPage(c *gin.Context) {

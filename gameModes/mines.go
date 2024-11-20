@@ -23,12 +23,12 @@ const (
 type Game struct {
     celle [][]Cella;
     state GameState;
-    bomb_count int;
-    flag_count int;
-    tempo int
+    bomb_count uint16;
+    flag_count uint16;
+    tempo uint16
 }
 
-func NewGame(width int, height int, n_bombe int, tempo int) *Game {
+func NewGame(width uint16, height uint16, n_bombe uint16, tempo uint16) *Game {
     ret := Game {
         celle: make([][]Cella, height),
         state: Running,
@@ -49,9 +49,9 @@ func NewGame(width int, height int, n_bombe int, tempo int) *Game {
             };
         }
     }
-    for i:=0; i<n_bombe; i++ {
-        x := r.Int() % (width);
-        y := r.Int() % (height);
+    for i:=0; i<int(n_bombe); i++ {
+        x := r.Int() % (int(width))
+        y := r.Int() % (int(height))
         if ret.celle[y][x].is_bomb {i--; continue}
         ret.celle[y][x].is_bomb=true;
     }
@@ -62,7 +62,7 @@ func NewGame(width int, height int, n_bombe int, tempo int) *Game {
             for i:=-1; i<=1; i++ {
                 for j:=-1; j<=1; j++ {
                     off_y, off_x := y+i, x+j;
-                    if ret.is_inside(off_x, off_y) && !ret.celle[off_y][off_x].is_bomb {
+                    if ret.is_inside(off_x,off_y) && !ret.celle[off_y][off_x].is_bomb {
                         ret.celle[off_y][off_x].label++;
                     }
                 }
@@ -73,18 +73,18 @@ func NewGame(width int, height int, n_bombe int, tempo int) *Game {
     return &ret;
 }
 
-func (g *Game) get_h() int {
-    return len(g.celle)
+func (g *Game) get_h() uint16 {
+    return uint16(len(g.celle))
 }
-func (g *Game) get_w() int {
+func (g *Game) get_w() uint16 {
     if len(g.celle) == 0 {
         return 0;
     }
-    return len(g.celle[0]);
+    return uint16(len(g.celle[0]))
 }
 
-func (g *Game) click(x int, y int) error {
-    if err:=g.check_bounds(x,y); err!=nil {return err;}
+func (g *Game) click(x uint16, y uint16) error {
+    if err:=g.check_bounds(int(x),int(y)); err!=nil {return err;}
 
     stack := NewStack[*Cella]();
     for stack.len()>0 {
@@ -99,8 +99,8 @@ func (g *Game) click(x int, y int) error {
         if corrente.label > 0 {continue;}
         for i:=-1; i<=1; i++ {
             for j:=-1; j<=1; j++ {
-                off_y := y+i;
-                off_x := x+i;
+                off_y := int(y)+i;
+                off_x := int(x)+i;
                 if !g.is_inside(off_x, off_y) {continue;}
                 stack.push(&g.celle[off_y][off_x]);
             }
@@ -113,8 +113,8 @@ func (g *Game) click(x int, y int) error {
 // Toggles the flagged state of a cell.
 // Returns the new state.
 // Errors if the coordinates lay outside the map
-func (g *Game) flag(x int, y int) (bool, error) {
-    if err:=g.check_bounds(x,y); err!=nil {return false, err;}
+func (g *Game) flag(x uint16, y uint16) (bool, error) {
+    if err:=g.check_bounds(int(x),int(y)); err!=nil {return false, err;}
     g.celle[y][x].is_flagged = !g.celle[y][x].is_flagged;
     if g.celle[y][x].is_flagged {
         g.flag_count++;
@@ -126,7 +126,7 @@ func (g *Game) flag(x int, y int) (bool, error) {
 }
 
 func (g *Game) is_inside(x int, y int) bool {
-    return x>=0 && y>=0 && x<g.get_w() && y<g.get_h();
+    return x>=0 && y>=0 && x<int(g.get_w()) && y<int(g.get_h())
 }
 func (g *Game) check_bounds(x int, y int) error {
     if g.is_inside(x, y) {return nil;}

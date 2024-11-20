@@ -12,13 +12,6 @@ let cellSize=30;
 
 async function setup() {
     await b;
-    // const AR = width/height;
-    // let W = section.clientWidth;
-    // let H = section.clientWidth/AR;
-    // if (H>window.innerHeight*0.8) {
-    //     H = window.innerHeight*0.8;
-    //     W = H*AR;
-    // }
     let W = grid_width*cellSize;
     let H = grid_height*cellSize;
     if (W > section.clientWidth) {
@@ -34,6 +27,7 @@ async function setup() {
 
     const canvas = createCanvas(W, H);
     canvas.parent(section);
+    section.addEventListener('contextmenu', event => event.preventDefault());
     resizeCollapsable();
 }
 
@@ -49,11 +43,20 @@ function draw() {
     }
 }
 
-function mouseClicked() {
-    console.log("A");
+function mousePressed() {
+    if (mouseX>width||mouseX<0||mouseY<0||mouseY>height) return true;
     const x = Math.floor(mouseX/cellSize);
     const y = Math.floor(mouseY/cellSize);
-    socket.send(new Uint16Array([x,y]).buffer);
+    const flag = mouseButton!=LEFT;
+    const bits = new ArrayBuffer(5);
+    const view = new DataView(bits);
+    view.setInt16(0, x);
+    view.setInt16(2, y);
+    view.setInt8(4, flag?1:0);
+    
+    socket.send(bits);
+
+    return false;
 }
 
 const phases = {
@@ -66,7 +69,6 @@ socket.addEventListener("message", e=>{
         const data_view = new DataView(ab);
         const data = [];
         for (let i=0; i<data_view.byteLength/2; i++) {
-            console.log(data_view.getUint16(i*2));
             data.push(data_view.getUint16(i*2))
         }
 
