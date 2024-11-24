@@ -9,6 +9,7 @@ import (
 
 	"github.com/diego-oniarti/mines1v1/shared"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	_ "github.com/gorilla/websocket"
 )
 
@@ -29,20 +30,19 @@ func bytesToMove(b []byte) (uint16, uint16, bool) {
     x := binary.BigEndian.Uint16(b[0:2])
     y := binary.BigEndian.Uint16(b[2:4])
     flag := b[4]>0
-
     return x,y,flag
 }
 func SinglePlayerWs(c *gin.Context) {
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
+    conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+    if err != nil {
         log.Println("Cannot create websocket");
-		c.String(http.StatusInternalServerError, "Impossibile creare WebSocket")
-		return
-	}
-	defer conn.Close()
+        c.String(http.StatusInternalServerError, "Impossibile creare WebSocket")
+        return
+    }
+    defer conn.Close()
 
-	messageType, game_id, err := conn.ReadMessage()
-	if err != nil || messageType!=1 { return }
+    messageType, game_id, err := conn.ReadMessage()
+    if err != nil || messageType!=1 { return }
 
     game_id_str := string(game_id[:])
     game_params, ok := games_params[game_id_str]
@@ -57,20 +57,62 @@ func SinglePlayerWs(c *gin.Context) {
         game_params.tempo,
     }))
 
-    game := NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo)
+    // game := NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo)
+    var game *Game
 
-    for game.state==Running {
+    isFirstMove := true;
+    for game==nil || game.state==Running {
         messageType, move, err := conn.ReadMessage()
         if err != nil || messageType!=2 { return }
         x,y,flag := bytesToMove(move)
-        log.Println(x,y,flag)
+
+        if isFirstMove {
+            game = NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo, x,y)
+            isFirstMove=false
+        }
 
         if flag {
-            game.flag(x, y)
+            flagged, err := game.flag(x, y)
+            if err==nil {
+                send_flagged(flagged, x, y, conn)
+            }
         }else{
-            game.click(x, y)
+            changes, err := game.click(x, y)
+            if err==nil {
+                send_cnahges(&changes, conn, game.state)
+            }
         }
     }
+}
+
+func send_flagged(flagged bool, x uint16, y uint16, conn *websocket.Conn) {
+    buffer := new(bytes.Buffer)
+    var bits byte = 64
+    if flagged {bits+=32}
+    binary.Write(buffer, binary.BigEndian, bits)
+    binary.Write(buffer, binary.BigEndian, x)
+    binary.Write(buffer, binary.BigEndian, y)
+    conn.WriteMessage(2, buffer.Bytes())
+}
+
+func send_cnahges(changes *[]CellaCoords, conn *websocket.Conn, state GameState) {
+    buffer := new(bytes.Buffer)
+    var state_bits byte = 0
+    if state != Running {
+        state_bits+=32
+        if state==Won {
+            state_bits+=16
+        }
+    }
+    binary.Write(buffer, binary.BigEndian, state_bits)
+    for i, change := range(*changes) {
+        binary.Write(buffer, binary.BigEndian, change.x)
+        binary.Write(buffer, binary.BigEndian, change.y)
+        var hasNext uint8
+        if i==len(*changes)-1 {hasNext=0} else {hasNext=8}
+        binary.Write(buffer, binary.BigEndian, (change.cella.label<<4) + hasNext)
+    }
+    conn.WriteMessage(2, buffer.Bytes())
 }
 
 func arrToBuff(arr []uint16) []byte {
@@ -107,11 +149,11 @@ func SinglePlayerPage(c *gin.Context) {
     }
 
     games_params[game_id] = GameParams{
-    	width:  uint16(width),
-    	height: uint16(height),
-    	bombs:  uint16(bombs),
-    	timed:  timed!="off",
-    	tempo:  uint16(tempo),
+        width:  uint16(width),
+        height: uint16(height),
+        bombs:  uint16(bombs),
+        timed:  timed!="off",
+        tempo:  uint16(tempo),
     }
 
     shared.Render(c, http.StatusOK, "singlePlayer.html", gin.H{"game_id": game_id});
