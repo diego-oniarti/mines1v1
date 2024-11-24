@@ -25,7 +25,7 @@ func (s *Stack[T]) Len() int {
 
 func NewStack[T any]() Stack[T] {
     return Stack[T]{
-    	items:  []T{},
-    	length: 0,
+        items:  []T{},
+        length: 0,
     }
 }

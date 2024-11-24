@@ -1,9 +1,9 @@
 package main
 
 import (
-	"testing"
+    "testing"
 
-	"github.com/diego-oniarti/mines1v1/gamemodes"
+    "github.com/diego-oniarti/mines1v1/gamemodes"
 )
 
 func TestStack(t *testing.T) {

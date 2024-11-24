@@ -5,15 +5,15 @@ socket.addEventListener("open", ()=>{
     socket.send(game_id);
 });
 
-let opening = true;
 let grid_width,grid_height,tot_bombs,time;
 let a; let b = new Promise(r=>{a=r});
-let cellSize=30;
+let cellSize=40;
 
 class Cella {
-    constructor(flag, number) {
+    constructor(flag, number, bomb) {
         this.flag = flag;
         this.number = number;
+        this.bomb = bomb;
     }
 }
 /** @type{Cella[][]} */
@@ -41,7 +41,7 @@ async function setup() {
 }
 
 function draw() {
-    if (opening) return;
+    if (phase==phases.GetGameParams) return;
     background(200);
     stroke(150);
     for (let i=1; i<grid_width; i++) {
@@ -64,15 +64,41 @@ function draw() {
             fill(150);
             rect(x*cellSize, y*cellSize, cellSize, cellSize);
             fill(0);
+            if (celle[y][x].bomb) {
+                stroke(200,0,0);
+                line(x*cellSize, y*cellSize,(x+1)*cellSize, (y+1)*cellSize);
+                line((x+1)*cellSize, y*cellSize,x*cellSize, (y+1)*cellSize);
+                noStroke();
+                continue;
+            }
             if (celle[y][x].number!=0) {
                 text(celle[y][x].number, (x+0.5)*cellSize, (y+0.5)*cellSize);
             }
         }
     }
+    if (phase==phases.Won) {
+        textSize(height/5);
+        textStyle(BOLD);
+        fill(50,200,50);
+        stroke(50,100,50);
+        strokeWeight(2);
+        text("YOU WON", width/2, height/2);
+        textStyle(NORMAL);
+    }
+    if (phase==phases.Lost) {
+        textSize(height/5);
+        textStyle(BOLD);
+        fill(200,0,0);
+        stroke(100,50,50);
+        strokeWeight(2);
+        text("YOU LOST", width/2, height/2);
+        textStyle(NORMAL);
+    }
 }
 
 function mousePressed() {
     if (mouseX>width||mouseX<0||mouseY<0||mouseY>height) return true;
+    if (phase != phases.GetUpdates) return true;
     const x = Math.floor(mouseX/cellSize);
     const y = Math.floor(mouseY/cellSize);
     const flag = mouseButton!=LEFT;
@@ -81,7 +107,7 @@ function mousePressed() {
     view.setInt16(0, x);
     view.setInt16(2, y);
     view.setInt8(4, flag?1:0);
-    
+
     socket.send(bits);
 
     return false;
@@ -90,6 +116,8 @@ function mousePressed() {
 const phases = {
     GetGameParams: 1,
     GetUpdates: 2,
+    Won: 3,
+    Lost: 4,
 }
 let phase = phases.GetGameParams;
 
@@ -115,7 +143,6 @@ function get_game_params(data_view) {
     }
     [grid_width,grid_height,tot_bombs,time] = data;
     a();
-    opening = false;
     phase = phases.GetUpdates;
     for (let y=0; y<grid_width; y++) {
         celle.push([])
@@ -135,6 +162,7 @@ function get_updates(data_view) {
         case 0:
             const gameover = (first_byte & 0b00100000)>0;
             const won = (first_byte & 0b00010000)>0;
+            const lost = gameover && !won;
             let off = 1;
             let has_next = true;
             do {
@@ -144,15 +172,24 @@ function get_updates(data_view) {
                 const num = payload>>4;
                 has_next = (payload&0b00001000)>0;
 
-                celle[y][x] = new Cella(false, num);
+                if (lost) {
+                    celle[y][x] = new Cella(false, 0, true);
+                }else{
+                    celle[y][x] = new Cella(false, num, false);
+                }
             } while (has_next);
+
+            if (gameover) {
+                phase = won ? phases.Won : phases.Lost;
+                return;
+            }
             break;
         case 1:
             const flag = (first_byte&0b00100000)>0;
             const x = data_view.getUint16(1);
             const y = data_view.getUint16(3);
             if (flag) {
-                celle[y][x] = new Cella(true, 0);
+                celle[y][x] = new Cella(true, 0, false);
             }else{
                 celle[y][x] = null;
             }

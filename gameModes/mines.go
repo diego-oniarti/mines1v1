@@ -108,6 +108,22 @@ func (g *Game) click(x uint16, y uint16) ([]CellaCoords, error) {
 
     changed := make([]CellaCoords, 0)
 
+    if (g.celle[y][x].is_bomb) {
+        for y, row := range g.celle {
+            for x, cella := range row {
+                if cella.is_bomb && !cella.is_flagged {
+                    changed = append(changed, CellaCoords{
+                        x:     uint16(x),
+                        y:     uint16(y),
+                        cella: cella,
+                    })
+                }
+            }
+        }
+        g.state = Lost;
+        return changed, nil;
+    }
+
     stack := NewStack[CellaCoordsRef]();
     stack.Push(CellaCoordsRef{x, y, &g.celle[y][x]})
 
@@ -118,10 +134,6 @@ func (g *Game) click(x uint16, y uint16) ([]CellaCoords, error) {
         corrente.cella.is_hidden = false;
 
         changed = append(changed, CellaCoords{corrente.x, corrente.y, *corrente.cella})
-        if corrente.cella.is_bomb {
-            g.state = Lost;
-            return changed, nil;
-        }
 
         if corrente.cella.label > 0 {continue;}
         for i:=-1; i<=1; i++ {
