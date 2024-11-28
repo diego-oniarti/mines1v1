@@ -70,7 +70,6 @@ for (let bottone of document.getElementsByClassName('collapseButton')) {
 
 for (let toggle of document.getElementsByClassName("toggle")) {
     toggle.addEventListener("click", ()=>{
-        toggle.classList.toggle("toggled");
         for (let child of toggle.children) {
             if (child.tagName==="INPUT") {
                 child.checked = !child.checked;

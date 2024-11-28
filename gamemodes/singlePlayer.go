@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/diego-oniarti/mines1v1/shared"
 	"github.com/gin-gonic/gin"
@@ -57,31 +58,49 @@ func SinglePlayerWs(c *gin.Context) {
         game_params.tempo,
     }))
 
-    // game := NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo)
     var game *Game
 
     isFirstMove := true;
+
+    remaining_time := time.Duration(game_params.tempo)*time.Millisecond
+    var last_move time.Time
+
     for game==nil || game.state==Running {
+        if !isFirstMove && game_params.timed {
+            conn.SetReadDeadline(time.Now().Add(remaining_time))
+        }
         messageType, move, err := conn.ReadMessage()
-        if err != nil || messageType!=2 { return }
+        if err != nil {
+            changes := game.get_loosing_message()
+            game.state=Lost
+            send_changes(&changes, conn, game.state)
+            return
+        }
+        if messageType!=2 { return } // messageType: 1=text; 2=binary
         x,y,flag := bytesToMove(move)
 
         if isFirstMove {
-            game = NewGame(game_params.width, game_params.height, game_params.bombs, game_params.tempo, x,y)
+            if flag { continue }
+            game = NewGame(game_params.width, game_params.height,
+            game_params.bombs, game_params.tempo,
+            x,y)
             isFirstMove=false
         }
 
         if flag {
             flagged, err := game.flag(x, y)
             if err==nil {
+                remaining_time = remaining_time - time.Now().Sub(last_move)
                 send_flagged(flagged, x, y, conn)
             }
         }else{
             changes, err := game.click(x, y)
             if err==nil {
-                send_cnahges(&changes, conn, game.state)
+                send_changes(&changes, conn, game.state)
+                remaining_time = time.Duration(game_params.tempo)*time.Millisecond
             }
         }
+        last_move = time.Now()
     }
 }
 
@@ -95,7 +114,7 @@ func send_flagged(flagged bool, x uint16, y uint16, conn *websocket.Conn) {
     conn.WriteMessage(2, buffer.Bytes())
 }
 
-func send_cnahges(changes *[]CellaCoords, conn *websocket.Conn, state GameState) {
+func send_changes(changes *[]CellaCoords, conn *websocket.Conn, state GameState) {
     buffer := new(bytes.Buffer)
     var state_bits byte = 0
     if state != Running {
@@ -143,9 +162,11 @@ func SinglePlayerPage(c *gin.Context) {
         tempo = 0;
     }
 
-    game_id := shared.RandomString(6, "");
+    // Generate game ids until you get a free one
+    var game_id string
     for {
-        if _, ok := games_params[game_id]; !ok { break }
+        game_id = shared.RandomString(6, "");
+        if _, present := games_params[game_id]; !present { break }
     }
 
     games_params[game_id] = GameParams{

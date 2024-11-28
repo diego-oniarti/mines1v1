@@ -102,6 +102,22 @@ func (g *Game) get_w() uint16 {
     return uint16(len(g.celle[0]))
 }
 
+func (g *Game) get_loosing_message() ([]CellaCoords) {
+    changed := make([]CellaCoords, 0)
+    for y, row := range g.celle {
+        for x, cella := range row {
+            if cella.is_bomb && !cella.is_flagged {
+                changed = append(changed, CellaCoords{
+                    x:     uint16(x),
+                    y:     uint16(y),
+                    cella: cella,
+                })
+            }
+        }
+    }
+    return changed
+}
+
 func (g *Game) click(x uint16, y uint16) ([]CellaCoords, error) {
     if err:=g.check_bounds(int(x),int(y)); err!=nil {return nil, err;}
     if !g.celle[y][x].is_hidden {return nil, fmt.Errorf("Clicking uncovered cell");}
@@ -109,19 +125,8 @@ func (g *Game) click(x uint16, y uint16) ([]CellaCoords, error) {
     changed := make([]CellaCoords, 0)
 
     if (g.celle[y][x].is_bomb) {
-        for y, row := range g.celle {
-            for x, cella := range row {
-                if cella.is_bomb && !cella.is_flagged {
-                    changed = append(changed, CellaCoords{
-                        x:     uint16(x),
-                        y:     uint16(y),
-                        cella: cella,
-                    })
-                }
-            }
-        }
         g.state = Lost;
-        return changed, nil;
+        return g.get_loosing_message(), nil;
     }
 
     stack := NewStack[CellaCoordsRef]();
