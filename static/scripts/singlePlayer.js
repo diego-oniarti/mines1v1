@@ -40,10 +40,12 @@ async function setup() {
     resizeCollapsable();
 }
 
+let timer_start;
 function draw() {
     if (phase==phases.GetGameParams) return;
     background(200);
     stroke(150);
+    strokeWeight(1);
     for (let i=1; i<grid_width; i++) {
         line(i*cellSize,0, i*cellSize,height);
     }
@@ -76,23 +78,38 @@ function draw() {
             }
         }
     }
-    if (phase==phases.Won) {
-        textSize(height/5);
-        textStyle(BOLD);
-        fill(50,200,50);
-        stroke(50,100,50);
-        strokeWeight(2);
-        text("YOU WON", width/2, height/2);
-        textStyle(NORMAL);
-    }
-    if (phase==phases.Lost) {
-        textSize(height/5);
-        textStyle(BOLD);
-        fill(200,0,0);
-        stroke(100,50,50);
-        strokeWeight(2);
-        text("YOU LOST", width/2, height/2);
-        textStyle(NORMAL);
+
+    switch (phase) {
+        case phases.GetUpdates:
+            if (time==0 || !timer_start) break;
+            const R = Math.min(width,height)*0.8
+            const c = color(180,40,40,30);
+            stroke(c);
+            noFill();
+            strokeWeight(20);
+            circle(width/2,height/2, R);
+            noStroke();
+            fill(c);
+            arc(width/2, height/2, R-20, R-20, map(new Date()-timer_start, 0, time, 0,TWO_PI)-PI/2, -PI/2);
+            break;
+        case phases.Won:
+            textSize(height/5);
+            textStyle(BOLD);
+            fill(50,200,50);
+            stroke(50,100,50);
+            strokeWeight(2);
+            text("YOU WON", width/2, height/2);
+            textStyle(NORMAL);
+            break;
+        case phases.Lost:
+            textSize(height/5);
+            textStyle(BOLD);
+            fill(200,0,0);
+            stroke(100,50,50);
+            strokeWeight(2);
+            text("YOU LOST", width/2, height/2);
+            textStyle(NORMAL);
+            break;
     }
 }
 
@@ -182,6 +199,8 @@ function get_updates(data_view) {
             if (gameover) {
                 phase = won ? phases.Won : phases.Lost;
                 return;
+            } else {
+                timer_start = new Date();
             }
             break;
         case 1:

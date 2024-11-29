@@ -18,9 +18,9 @@
                             <div class="horizontal">
                                 <div class="form_fields">
                                     <span>
-                                        <input min="0" name="width" value="18" type="number" placeholder="width" required>
+                                        <input min="1" name="width" value="18" type="number" placeholder="width" required>
                                         x
-                                        <input min="0" name="height" value="14" type="number" placeholder="height" required>
+                                        <input min="1" name="height" value="14" type="number" placeholder="height" required>
                                     </span>
                                     <span>Bombe <input min="1" type="number" name="bombs" placeholder="bombs" value="40" required></span>
                                     <span>Tempo <div class="toggle"><input name="timed" type="checkbox"><div class="toggle_nob"></div></div></span>
@@ -32,7 +32,47 @@
                     </div>
                     <div class="section">
                         <p>
-                        Gioca da solo per allenarti nella versione classica, o sfida il cronometro nella versione a tempo.
+                            Gioca da solo per allenarti nella versione classica, o sfida il cronometro nella versione a tempo.
+                        </p>
+                    </div>
+                </div>
+                <div class="box">
+                    <div class="flex collapseButton"><h1>1v1</h1> <div class="V"></div></div>
+                    <div class="hr"></div>
+                    <div class="section centered">
+
+                        <div class="flex" style="width: 90%;"> <h2>Crea una partita</h2> </div>
+                        <div class="hr2"></div><br/>
+                        <form action="/1v1" method="get">
+                            <div class="horizontal">
+                                <div class="form_fields">
+                                    <span>
+                                        <input min="1" name="width" value="18" type="number" placeholder="width" required>
+                                        x
+                                        <input min="1" name="height" value="14" type="number" placeholder="height" required>
+                                    </span>
+                                    <span>Bombe <input min="1" type="number" name="bombs" placeholder="bombs" value="40" required></span>
+                                    <span>Tempo <div class="toggle"><input name="timed" type="checkbox"><div class="toggle_nob"></div></div></span>
+                                    <span><input min="1" type="number" name="tempo" placeholder="tempo" value="3000">ms</span>
+                                </div>
+                                <input type="submit" value="Gioca">
+                            </div>
+                        </form>
+
+                        <div class="flex" style="width: 90%;"> <h2>Crea una partita</h2> </div>
+                        <div class="hr2"></div><br/>
+                        <form action="/1v1" method="get">
+                            <div class="form_fields">
+                                <span><input name="code" placeholder="codice"></span>
+                            </div>
+                            <input type="submit" value="Unisciti">
+                        </form>
+
+                    </div>
+                    <div class="section">
+                        <p>
+                            Gioca con un amico. Il primo a colpire una bomba o esaurire il tempo perde.<br/>
+                            Vincere la partita porta a un pareggio.
                         </p>
                     </div>
                 </div>

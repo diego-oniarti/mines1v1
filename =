@@ -1,17 +1,17 @@
 package gamemodes
 
 import (
-    "bytes"
-    "encoding/binary"
-    "log"
-    "net/http"
-    "strconv"
-    "time"
+	"bytes"
+	"encoding/binary"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
 
-    "github.com/diego-oniarti/mines1v1/shared"
-    "github.com/gin-gonic/gin"
-    "github.com/gorilla/websocket"
-    _ "github.com/gorilla/websocket"
+	"github.com/diego-oniarti/mines1v1/shared"
+	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	_ "github.com/gorilla/websocket"
 )
 
 type GameParams struct {
@@ -82,8 +82,8 @@ func SinglePlayerWs(c *gin.Context) {
         if isFirstMove {
             if flag { continue }
             game = NewGame(game_params.width, game_params.height,
-                game_params.bombs, game_params.tempo,
-                x,y)
+            game_params.bombs, game_params.tempo,
+            x,y)
             isFirstMove=false
         }
 

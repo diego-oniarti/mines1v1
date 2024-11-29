@@ -1,20 +1,20 @@
 package main
 
 import (
-	"database/sql"
-	"html/template"
-	"log"
-	"net/http"
-	"net/smtp"
-	"os"
-	"regexp"
-	"strings"
-	"unicode/utf8"
+    "database/sql"
+    "html/template"
+    "log"
+    "net/http"
+    "net/smtp"
+    "os"
+    "regexp"
+    "strings"
+    "unicode/utf8"
 
-	"github.com/diego-oniarti/mines1v1/shared"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
-	"golang.org/x/crypto/bcrypt"
+    "github.com/diego-oniarti/mines1v1/shared"
+    "github.com/gin-gonic/gin"
+    "github.com/gorilla/sessions"
+    "golang.org/x/crypto/bcrypt"
 )
 
 func indexHandler(c *gin.Context) {
@@ -166,11 +166,11 @@ func send_mail(mail, code, name string) {
     }
 
     msg := "From: " + from + "\n" +
-        "To: " + mail + "\n" +
-        "Subject: Miens 1v1 Verification Email\n" +
-        "MIME-Version: 1.0\n" +
-        "Content-Type: text/html; charset=\"UTF-8\"\n\n" +
-        builder.String()
+    "To: " + mail + "\n" +
+    "Subject: Miens 1v1 Verification Email\n" +
+    "MIME-Version: 1.0\n" +
+    "Content-Type: text/html; charset=\"UTF-8\"\n\n" +
+    builder.String()
 
     err = smtp.SendMail("smtp.gmail.com:587",
         smtp.PlainAuth("", from, pass, "smtp.gmail.com"),

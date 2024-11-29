@@ -1,9 +1,9 @@
 package gamemodes
 
 import (
-	"fmt"
-	"math/rand"
-	"time"
+    "fmt"
+    "math/rand"
+    "time"
 )
 
 type Cella struct {
