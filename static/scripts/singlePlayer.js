@@ -1,6 +1,12 @@
 const socket = new WebSocket("ws://localhost:2357/wsSinglePlayer");
 const game_id = document.getElementById("game_id").innerText;
 const section = document.querySelector("#gameSection");
+const box = document.querySelector("#gameBox");
+
+const endgame_controls = document.querySelector("#endgame_controls");
+const play_again = document.querySelector("#replay");
+const goback = document.querySelector("#goback");
+
 socket.addEventListener("open", ()=>{
     socket.send(game_id);
 });
@@ -35,7 +41,7 @@ async function setup() {
     }
 
     const canvas = createCanvas(W, H);
-    canvas.parent(section);
+    canvas.parent(box);
     section.addEventListener('contextmenu', event => event.preventDefault());
     resizeCollapsable();
 }
@@ -155,7 +161,7 @@ socket.addEventListener("message", e=>{
 
 function get_game_params(data_view) {
     const data = [];
-    for (let i=0; i<data_view.byteLength/2; i++) {
+    for (let i=0; i<4; i++) {
         data.push(data_view.getUint16(i*2))
     }
     [grid_width,grid_height,tot_bombs,time] = data;
@@ -172,6 +178,7 @@ function get_game_params(data_view) {
 /**
  * @param {DataView} data_view 
  */
+
 function get_updates(data_view) {
     const first_byte = data_view.getInt8(0);
     type = first_byte >> 6;
@@ -198,6 +205,7 @@ function get_updates(data_view) {
 
             if (gameover) {
                 phase = won ? phases.Won : phases.Lost;
+                show_endgame_controls();
                 return;
             } else {
                 timer_start = new Date();
@@ -215,3 +223,21 @@ function get_updates(data_view) {
             break;
     }
 }
+
+function show_endgame_controls() {
+    endgame_controls.classList.add("form_fields");
+    resizeCollapsable();
+}
+
+play_again.addEventListener("click", ()=>{
+    phase = phases.GetUpdates;
+    // location.reload();
+    for (let row of celle) {
+        for (let i=0; i<row.length; i++) {
+            row[i] = null;
+        }
+    }
+    const a = new ArrayBuffer(1);
+    (new DataView(a)).setUint8(0,1);
+    socket.send(a);
+});

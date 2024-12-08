@@ -50,7 +50,6 @@ func SinglePlayerWs(c *gin.Context) {
     if !ok { return }
     delete(games_params, game_id_str)
 
-
     err = conn.WriteMessage(2, arrToBuff([]uint16{
         game_params.width,
         game_params.height,
@@ -60,47 +59,58 @@ func SinglePlayerWs(c *gin.Context) {
 
     var game *Game
 
-    isFirstMove := true;
+    for {
+        isFirstMove := true;
 
-    remaining_time := time.Duration(game_params.tempo)*time.Millisecond
-    var last_move time.Time
+        remaining_time := time.Duration(game_params.tempo)*time.Millisecond
+        var last_move time.Time
 
-    for game==nil || game.state==Running {
-        if !isFirstMove && game_params.timed {
-            conn.SetReadDeadline(time.Now().Add(remaining_time))
-        }
-        messageType, move, err := conn.ReadMessage()
-        if err != nil {
-            changes := game.get_loosing_message()
-            game.state=Lost
-            send_changes(&changes, conn, game.state)
-            return
-        }
-        if messageType!=2 { return } // messageType: 1=text; 2=binary
-        x,y,flag := bytesToMove(move)
+        for game==nil || game.state==Running {
+            if !isFirstMove && game_params.timed {
+                conn.SetReadDeadline(time.Now().Add(remaining_time))
+            }
+            messageType, move, err := conn.ReadMessage()
+            if err != nil {
+                if websocket.IsCloseError(err, 1001) {
+                    return
+                }
+                changes := game.get_loosing_message()
+                game.state=Lost
+                send_changes(&changes, conn, game.state)
+                return
+            }
+            if messageType!=2 { return } // messageType: 1=text; 2=binary
+            x,y,flag := bytesToMove(move)
 
-        if isFirstMove {
-            if flag { continue }
-            game = NewGame(game_params.width, game_params.height,
+            if isFirstMove {
+                if flag { continue }
+                game = NewGame(game_params.width, game_params.height,
                 game_params.bombs, game_params.tempo,
                 x,y)
-            isFirstMove=false
+                isFirstMove=false
+            }
+
+            if flag {
+                flagged, err := game.flag(x, y)
+                if err==nil {
+                    remaining_time = remaining_time - time.Now().Sub(last_move)
+                    send_flagged(flagged, x, y, conn)
+                }
+            }else{
+                changes, err := game.click(x, y)
+                if err==nil {
+                    send_changes(&changes, conn, game.state)
+                    remaining_time = time.Duration(game_params.tempo)*time.Millisecond
+                }
+            }
+            last_move = time.Now()
         }
 
-        if flag {
-            flagged, err := game.flag(x, y)
-            if err==nil {
-                remaining_time = remaining_time - time.Now().Sub(last_move)
-                send_flagged(flagged, x, y, conn)
-            }
-        }else{
-            changes, err := game.click(x, y)
-            if err==nil {
-                send_changes(&changes, conn, game.state)
-                remaining_time = time.Duration(game_params.tempo)*time.Millisecond
-            }
+        game=nil
+        messageType, _, err := conn.ReadMessage()
+        if err!=nil || messageType!=2 {
+            return
         }
-        last_move = time.Now()
     }
 }
 

@@ -38,6 +38,10 @@ document.getElementById('navCollapse').addEventListener('click',e=>{
 });
 
 function resizeCollapsable () {
+    for (element of document.getElementsByClassName('resizable')) {
+        if (element.style.maxHeight!='0px')
+            element.style.maxHeight = element.scrollHeight + "px";
+    }
     for (element of document.getElementsByClassName('section')) {
         if (element.style.maxHeight!='0px')
             element.style.maxHeight = element.scrollHeight + "px";

@@ -188,5 +188,3 @@ func (g *Game) check_bounds(x int, y int) error {
     if g.is_inside(x, y) {return nil;}
     return fmt.Errorf("Coordinates (%d,%d) are outside the bounds for gama (%d,%d)", x,y, g.get_w(), g.get_h());
 }
-
-

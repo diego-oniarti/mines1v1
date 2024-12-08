@@ -39,7 +39,7 @@ func loginHandler(c *gin.Context) {
 
     var user User
     err := db.QueryRow("SELECT name, mail, psw FROM users WHERE mail=? AND confirmed=true", mail).
-        Scan(&user.Username, &user.Mail, &user.Psw);
+    Scan(&user.Username, &user.Mail, &user.Psw);
     if err == sql.ErrNoRows || bcrypt.CompareHashAndPassword([]byte(user.Psw), []byte(password)) != nil {
         log.Println(err)
         shared.Render(c, http.StatusUnauthorized, "login.html", nil)
@@ -98,7 +98,7 @@ func registerHandler(c *gin.Context) {
     send_mail(mail, code, username);
 
     _, err = db.Exec("INSERT INTO users (name, psw, mail, confirmed, confirm_key) VALUES (?, ?, ?, false, ?)",
-        username, hashedPassword, mail, code)
+    username, hashedPassword, mail, code)
     if err != nil {
         log.Println("Database error during registration:", err)
         shared.Render(c, http.StatusInternalServerError, "login.html", gin.H{"error": "Error creating user"})
@@ -173,8 +173,8 @@ func send_mail(mail, code, name string) {
     builder.String()
 
     err = smtp.SendMail("smtp.gmail.com:587",
-        smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-        from, []string{mail}, []byte(msg))
+    smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
+    from, []string{mail}, []byte(msg))
 
     if err != nil {
         log.Printf("smtp error: %s", err)

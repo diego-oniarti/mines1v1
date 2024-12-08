@@ -33,12 +33,12 @@ input:focus-visible, input:focus {
 .dark input {
     background-color: var(--shade8);
 }
-input[type=submit] {
+input[type=submit], input[type=button] {
     border: 2px solid var(--shade8);
     background-color: var(--shade1);
     color: var(--shade8);
 }
-.dark input[type=submit] {
+.dark input[type=submit], .dark input[type=button] {
     border: 2px solid var(--shade1);
     background-color: var(--shade8);
     color: var(--shade1);
