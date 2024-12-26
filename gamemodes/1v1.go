@@ -12,7 +12,7 @@ import (
 	_ "github.com/gorilla/websocket"
 )
 
-func SinglePlayerWs(c *gin.Context) {
+func M1v1Ws(c *gin.Context) {
     conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
     if err != nil {
         log.Println("Cannot create websocket");
@@ -93,11 +93,11 @@ func SinglePlayerWs(c *gin.Context) {
     }
 }
 
-func SinglePlayerPage(c *gin.Context) {
+func M1v1Page(c *gin.Context) {
     var width, height, bombs, tempo int;
     valid := true;
-    tmp := func(name, def string) (int) {
-        v,e := strconv.Atoi(c.DefaultQuery(name, def))
+    tmp := func(name, default_v string) (int) {
+        v,e := strconv.Atoi(c.DefaultQuery(name, default_v))
         if e!=nil || v<=0 { valid=false; return -1; }
         return v;
     }
@@ -130,5 +130,5 @@ func SinglePlayerPage(c *gin.Context) {
         tempo:  uint16(tempo),
     }
 
-    shared.Render(c, http.StatusOK, "singlePlayer.html", gin.H{"game_id": game_id});
+    shared.Render(c, http.StatusOK, "1v1.html", gin.H{"game_id": game_id});
 }

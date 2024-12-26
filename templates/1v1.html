@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {{template "header" .}}
+        <link href="/static/css/form.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/p5@1.11.1/lib/p5.min.js"></script>
+        <script src="/static/scripts/M1v1.js" defer></script>
+    </head>
+    <body class="dark">
+        {{template "navbar" .}}
+        <div id="mainContainer">
+            <h1 id="titoloPagina">1v1 - {{.game_id}}</h1>
+
+            <div class="boxes">
+                <div class="box clear">
+                    <div id="gameSection" class="section centered">
+                        <div class="resizable" id="gameBox">
+                            <br/>
+                        </div>
+                        <br/>
+                        <div class="hidden" id="endgame_controls">
+                            <span>
+                                <input id="replay" type="button" value="play again"/>
+                                <a href="/lobby"><input id="goback" type="button" value="back to lobby"/></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{template "footer" .}}
+        <div class="hidden" id="game_id">{{.game_id}}</div>
+    </body>
+</html>

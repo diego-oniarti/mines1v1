@@ -7,10 +7,10 @@ import (
     "time"
 )
 
-func RandomString(length int, pre string) string {
+func RandomString(length int, prefix string) string {
     const dict = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM-_0123456789"
     var b strings.Builder
-    fmt.Fprint(&b, pre)
+    fmt.Fprint(&b, prefix)
     rng := rand.New(rand.NewSource(time.Now().UnixNano()))
     for i := 0; i < length; i++ {
         fmt.Fprintf(&b, "%c", dict[rng.Int()%len(dict)])

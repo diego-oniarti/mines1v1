@@ -36,5 +36,8 @@ func main() {
     r.GET("/singlePlayer", gamemodes.SinglePlayerPage)
     r.GET("/wsSinglePlayer", gamemodes.SinglePlayerWs)
 
+    r.GET("/1v1", gamemodes.M1v1Ws)
+    r.GET("/ws1v1", gamemodes.M1v1Page)
+
     r.Run(":2357")
 }
