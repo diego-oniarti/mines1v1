@@ -1,15 +1,15 @@
 package gamemodes
 
 import (
-	"log"
-	"net/http"
-	"strconv"
-	"time"
+    "log"
+    "net/http"
+    "strconv"
+    "time"
 
-	"github.com/diego-oniarti/mines1v1/shared"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	_ "github.com/gorilla/websocket"
+    "github.com/diego-oniarti/mines1v1/shared"
+    "github.com/gin-gonic/gin"
+    "github.com/gorilla/websocket"
+    _ "github.com/gorilla/websocket"
 )
 
 func SinglePlayerWs(c *gin.Context) {
@@ -27,7 +27,7 @@ func SinglePlayerWs(c *gin.Context) {
     game_id_str := string(game_id[:])
     game_params, ok := games_params[game_id_str]
     if !ok { return }
-    delete(games_params, game_id_str)
+    defer delete(games_params, game_id_str)
 
     err = conn.WriteMessage(2, arrToBuff([]uint16{
         game_params.width,

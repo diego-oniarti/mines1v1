@@ -1,11 +1,11 @@
 package gamemodes
 
 import (
-	"bytes"
-	"encoding/binary"
-	"net/http"
+    "bytes"
+    "encoding/binary"
+    "net/http"
 
-	"github.com/gorilla/websocket"
+    "github.com/gorilla/websocket"
 )
 
 type GameParams struct {
@@ -20,6 +20,7 @@ var games_params map[string]GameParams;
 func init() {
     games_params = make(map[string]GameParams);
 }
+
 func bytesToMove(b []byte) (uint16, uint16, bool) {
     x := binary.BigEndian.Uint16(b[0:2])
     y := binary.BigEndian.Uint16(b[2:4])
@@ -64,10 +65,10 @@ func send_changes(changes *[]CellaCoords, conn *websocket.Conn, state GameState)
 }
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		// Configura l'origine se necessario per la sicurezza (qui lo lasciamo aperto per testing)
-		return true
-	},
+    ReadBufferSize:  1024,
+    WriteBufferSize: 1024,
+    CheckOrigin: func(r *http.Request) bool {
+        // Configura l'origine se necessario per la sicurezza (qui lo lasciamo aperto per testing)
+        return true
+    },
 }
