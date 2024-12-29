@@ -3,7 +3,6 @@ package gamemodes
 import (
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/diego-oniarti/mines1v1/shared"
@@ -25,9 +24,10 @@ func M1v1Ws(c *gin.Context) {
     if err != nil || messageType!=1 { return }
 
     game_id_str := string(game_id[:])
-    game_params, ok := games_params[game_id_str]
+    game_instance, ok := games[game_id_str]
+    game_params := game_instance.params
     if !ok { return }
-    delete(games_params, game_id_str)
+    delete(games, game_id_str)
 
     err = conn.WriteMessage(2, arrToBuff([]uint16{
         game_params.width,
@@ -94,41 +94,14 @@ func M1v1Ws(c *gin.Context) {
 }
 
 func M1v1Page(c *gin.Context) {
-    var width, height, bombs, tempo int;
-    valid := true;
-    tmp := func(name, default_v string) (int) {
-        v,e := strconv.Atoi(c.DefaultQuery(name, default_v))
-        if e!=nil || v<=0 { valid=false; return -1; }
-        return v;
+    game_id := c.Query("game_id")
+    if game_id=="" {
+        c.Status(400)
+        return
     }
-    width = tmp("width" , "18")
-    height = tmp("height", "14")
-    bombs = tmp("bombs" , "40")
-    timed := c.DefaultQuery("timed" , "off")
-    tempo = tmp("tempo" , "3000")
-    if !valid {
-        c.Status(400);
-        return;
+    if _, present := games[game_id]; !present {
+        c.Status(400)
+        return
     }
-
-    if timed == "off" {
-        tempo = 0;
-    }
-
-    // Generate game ids until you get a free one
-    var game_id string
-    for {
-        game_id = shared.RandomString(6, "");
-        if _, present := games_params[game_id]; !present { break }
-    }
-
-    games_params[game_id] = GameParams{
-        width:  uint16(width),
-        height: uint16(height),
-        bombs:  uint16(bombs),
-        timed:  timed!="off",
-        tempo:  uint16(tempo),
-    }
-
     shared.Render(c, http.StatusOK, "1v1.html", gin.H{"game_id": game_id});
 }

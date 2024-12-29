@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://localhost:2357/ws1v1");
+const socket = new WebSocket("ws://localhost:2357/wsSinglePlayer");
 const game_id = document.getElementById("game_id").innerText;
 const section = document.querySelector("#gameSection");
 const box = document.querySelector("#gameBox");
@@ -23,7 +23,7 @@ class Cella {
     }
 }
 /** @type{Cella[][]} */
-const celle = [];
+    const celle = [];
 
 async function setup() {
     await b;
@@ -65,7 +65,9 @@ function draw() {
     for (let y=0; y<grid_height; y++) {
         for (let x=0; x<grid_width; x++) {
             if (!celle[y][x]) continue;
+            noStroke();
             if (celle[y][x].flag) {
+                fill(0);
                 text("🏳", (x+0.5)*cellSize, (y+0.5)*cellSize);
                 continue;
             }
@@ -176,53 +178,55 @@ function get_game_params(data_view) {
 }
 
 /**
- * @param {DataView} data_view 
- */
+    * @param {DataView} data_view 
+    */
 
-function get_updates(data_view) {
-    const first_byte = data_view.getInt8(0);
-    type = first_byte >> 6;
-    switch (type) {
-        case 0:
-            const gameover = (first_byte & 0b00100000)>0;
-            const won = (first_byte & 0b00010000)>0;
-            const lost = gameover && !won;
-            let off = 1;
-            let has_next = true;
-            do {
-                const x = data_view.getUint16(off); off+=2;
-                const y = data_view.getUint16(off); off+=2;
-                const payload = data_view.getUint8(off); off+=1;
-                const num = payload>>4;
-                has_next = (payload&0b00001000)>0;
+    function get_updates(data_view) {
+        const first_byte = data_view.getInt8(0);
+        type = first_byte >> 6;
+        switch (type) {
+            case 0:
+                const gameover = (first_byte & 0b00100000)>0;
+                const won = (first_byte & 0b00010000)>0;
+                const lost = gameover && !won;
+                let off = 1;
+                let has_next = true;
+                do {
+                    const x = data_view.getUint16(off); off+=2;
+                    const y = data_view.getUint16(off); off+=2;
+                    const payload = data_view.getUint8(off); off+=1;
+                    const num = payload>>4;
+                    has_next = (payload&0b00001000)>0;
 
-                if (lost) {
-                    celle[y][x] = new Cella(false, 0, true);
-                }else{
-                    celle[y][x] = new Cella(false, num, false);
+                    if (lost) {
+                        celle[y][x] = new Cella(false, 0, true);
+                    }else{
+                        celle[y][x] = new Cella(false, num, false);
+                    }
+                } while (has_next);
+
+                if (gameover) {
+                    phase = won ? phases.Won : phases.Lost;
+                    console.log("timer null");
+                    timer_start=null
+                    show_endgame_controls();
+                    return;
+                } else {
+                    timer_start = new Date();
                 }
-            } while (has_next);
-
-            if (gameover) {
-                phase = won ? phases.Won : phases.Lost;
-                show_endgame_controls();
-                return;
-            } else {
-                timer_start = new Date();
-            }
-            break;
-        case 1:
-            const flag = (first_byte&0b00100000)>0;
-            const x = data_view.getUint16(1);
-            const y = data_view.getUint16(3);
-            if (flag) {
-                celle[y][x] = new Cella(true, 0, false);
-            }else{
-                celle[y][x] = null;
-            }
-            break;
+                break;
+            case 1:
+                const flag = (first_byte&0b00100000)>0;
+                const x = data_view.getUint16(1);
+                const y = data_view.getUint16(3);
+                if (flag) {
+                    celle[y][x] = new Cella(true, 0, false);
+                }else{
+                    celle[y][x] = null;
+                }
+                break;
+        }
     }
-}
 
 function show_endgame_controls() {
     endgame_controls.classList.add("form_fields");
@@ -230,14 +234,12 @@ function show_endgame_controls() {
 }
 
 play_again.addEventListener("click", ()=>{
-    phase = phases.GetUpdates;
-    // location.reload();
     for (let row of celle) {
         for (let i=0; i<row.length; i++) {
             row[i] = null;
         }
     }
-    const a = new ArrayBuffer(1);
-    (new DataView(a)).setUint8(0,1);
-    socket.send(a);
+
+    socket.send("replay");
+    phase = phases.GetUpdates;
 });

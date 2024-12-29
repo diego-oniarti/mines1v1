@@ -3,6 +3,7 @@
     <head>
         {{template "header" .}}
         <link rel="stylesheet" href="/static/css/form.css">
+        <script src="/static/scripts/lobby.js"></script>
     </head>
     <body class="dark">
         {{template "navbar" .}}
@@ -14,7 +15,7 @@
                     <div class="flex collapseButton"><h1>Giocatore Singolo</h1> <div class="V"></div></div>
                     <div class="hr"></div>
                     <div class="section centered">
-                        <form action="/singlePlayer" method="get">
+                        <form onsubmit="return submitSingle(this)">
                             <div class="horizontal">
                                 <div class="form_fields">
                                     <span>

@@ -39,5 +39,7 @@ func main() {
     r.GET("/1v1", gamemodes.M1v1Page)
     r.GET("/ws1v1", gamemodes.M1v1Ws)
 
+    r.POST("createGame", gamemodes.CreateGame)
+
     r.Run(":2357")
 }
