@@ -1,9 +1,11 @@
 package main
 
 import (
+	"os"
+
+	"github.com/diego-oniarti/mines1v1/gamemodes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-    "github.com/diego-oniarti/mines1v1/gamemodes"
 )
 
 
@@ -41,5 +43,5 @@ func main() {
 
     r.POST("createGame", gamemodes.CreateGame)
 
-    r.Run(":2357")
+    r.Run(":"+os.Getenv("PORT"))
 }
