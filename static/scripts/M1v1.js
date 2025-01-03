@@ -16,10 +16,11 @@ let a; let b = new Promise(r=>{a=r});
 let cellSize=40;
 
 class Cella {
-    constructor(flag, number, bomb) {
+    constructor(flag, number, bomb, player) {
         this.flag = flag;
         this.number = number;
         this.bomb = bomb;
+        this.player = player
     }
 }
 /** @type{Cella[][]} */
@@ -65,24 +66,33 @@ function draw() {
     for (let y=0; y<grid_height; y++) {
         for (let x=0; x<grid_width; x++) {
             if (!celle[y][x]) continue;
+            const cella = celle[y][x];
             noStroke();
-            if (celle[y][x].flag) {
-                fill(0);
+            if (cella.flag) {
+                if (cella.player) {
+                    fill(0, 255, 255);
+                }else{
+                    fill(255, 0, 255);
+                }
                 text("🏳", (x+0.5)*cellSize, (y+0.5)*cellSize);
                 continue;
             }
             fill(150);
             rect(x*cellSize, y*cellSize, cellSize, cellSize);
-            fill(0);
-            if (celle[y][x].bomb) {
+            if (cella.player) {
+                fill(0, 255, 255);
+            }else{
+                fill(255, 0, 255);
+            }
+            if (cella.bomb) {
                 stroke(200,0,0);
                 line(x*cellSize, y*cellSize,(x+1)*cellSize, (y+1)*cellSize);
                 line((x+1)*cellSize, y*cellSize,x*cellSize, (y+1)*cellSize);
                 noStroke();
                 continue;
             }
-            if (celle[y][x].number!=0) {
-                text(celle[y][x].number, (x+0.5)*cellSize, (y+0.5)*cellSize);
+            if (cella.number!=0) {
+                text(cella.number, (x+0.5)*cellSize, (y+0.5)*cellSize);
             }
         }
     }
@@ -183,7 +193,8 @@ function get_game_params(data_view) {
 
     function get_updates(data_view) {
         const first_byte = data_view.getInt8(0);
-        type = first_byte >> 6;
+        const type = first_byte >> 6;
+        const player = (first_byte & 1) == 0
         switch (type) {
             case 0:
                 const gameover = (first_byte & 0b00100000)>0;
@@ -199,9 +210,9 @@ function get_game_params(data_view) {
                     has_next = (payload&0b00001000)>0;
 
                     if (lost) {
-                        celle[y][x] = new Cella(false, 0, true);
+                        celle[y][x] = new Cella(false, 0, true, player);
                     }else{
-                        celle[y][x] = new Cella(false, num, false);
+                        celle[y][x] = new Cella(false, num, false, player);
                     }
                 } while (has_next);
 
@@ -220,7 +231,7 @@ function get_game_params(data_view) {
                 const x = data_view.getUint16(1);
                 const y = data_view.getUint16(3);
                 if (flag) {
-                    celle[y][x] = new Cella(true, 0, false);
+                    celle[y][x] = new Cella(true, 0, false, player);
                 }else{
                     celle[y][x] = null;
                 }
