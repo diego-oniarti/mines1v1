@@ -43,5 +43,5 @@ func main() {
 
     r.POST("createGame", gamemodes.CreateGame)
 
-    r.Run(":"+os.Getenv("PORT"))
+    r.Run("0.0.0.0:"+os.Getenv("PORT"))
 }

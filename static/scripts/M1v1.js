@@ -1,4 +1,4 @@
-const socket = new WebSocket("ws://localhost:2357/ws1v1");
+const socket = new WebSocket("/ws1v1");
 const game_id = document.getElementById("game_id").innerText;
 const section = document.querySelector("#gameSection");
 const box = document.querySelector("#gameBox");
