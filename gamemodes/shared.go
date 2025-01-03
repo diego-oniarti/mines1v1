@@ -22,13 +22,17 @@ type GameInstance struct {
     params GameParams;
     g1 *websocket.Conn;
     g2 *websocket.Conn;
+    a_to_b chan int
+    b_to_a chan int
+    game *Game
 }
 
-var games map[string]GameInstance;
+var games map[string]*GameInstance;
 func init() {
-    games = make(map[string]GameInstance);
+    games = make(map[string]*GameInstance);
 }
 
+// x, y, flag
 func bytesToMove(b []byte) (uint16, uint16, bool) {
     x := binary.BigEndian.Uint16(b[0:2])
     y := binary.BigEndian.Uint16(b[2:4])
@@ -36,10 +40,11 @@ func bytesToMove(b []byte) (uint16, uint16, bool) {
     return x,y,flag
 }
 
-func send_flagged(flagged bool, x uint16, y uint16, conn *websocket.Conn) {
+func send_flagged(flagged bool, x uint16, y uint16, conn *websocket.Conn, other bool) {
     buffer := new(bytes.Buffer)
     var bits byte = 64
     if flagged {bits+=32}
+    if other {bits+=1}
     binary.Write(buffer, binary.BigEndian, bits)
     binary.Write(buffer, binary.BigEndian, x)
     binary.Write(buffer, binary.BigEndian, y)
@@ -52,16 +57,19 @@ func arrToBuff(arr []uint16) []byte {
     return buffer.Bytes()
 }
 
-func send_changes(changes *[]CellaCoords, conn *websocket.Conn, state GameState) {
+func send_changes(changes *[]CellaCoords, conn *websocket.Conn, state GameState, opponent bool) {
     buffer := new(bytes.Buffer)
-    var state_bits byte = 0
+    var first_byte byte = 0
     if state != Running {
-        state_bits+=32
+        first_byte+=32
         if state==Won {
-            state_bits+=16
+            first_byte+=16
         }
     }
-    binary.Write(buffer, binary.BigEndian, state_bits)
+    if opponent {
+        first_byte += 1
+    }
+    binary.Write(buffer, binary.BigEndian, first_byte)
     for i, change := range(*changes) {
         binary.Write(buffer, binary.BigEndian, change.x)
         binary.Write(buffer, binary.BigEndian, change.y)
@@ -121,14 +129,16 @@ func CreateGame(c *gin.Context) {
         }
     }
 
-    games[game_id] = GameInstance{
-        params: GameParams{
-            width:  uint16(width),
+    games[game_id] = &GameInstance{
+    	params: GameParams{
+            width: uint16(width),
             height: uint16(height),
-            bombs:  uint16(bombs),
-            timed:  timed != "off",
-            tempo:  uint16(tempo),
+            bombs: uint16(bombs),
+            timed: timed != "off",
+            tempo: uint16(tempo),
         },
+    	a_to_b: make(chan int),
+    	b_to_a: make(chan int),
     }
 
     c.JSON(200, gin.H{

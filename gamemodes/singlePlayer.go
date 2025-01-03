@@ -24,8 +24,8 @@ func SinglePlayerWs(c *gin.Context) {
 
     game_id_str := string(game_id[:])
     game_instance, ok := games[game_id_str]
-    game_params := game_instance.params
     if !ok { return }
+    game_params := game_instance.params
     defer delete(games, game_id_str)
 
     err = conn.WriteMessage(2, arrToBuff([]uint16{
@@ -76,7 +76,7 @@ func SinglePlayerWs(c *gin.Context) {
                 case <-timer:
                     changes := game.get_loosing_message()
                     game.state=Lost
-                    send_changes(&changes, conn, game.state)
+                    send_changes(&changes, conn, game.state, false)
                     move = <-move_chn
                     messageType = <-message_type_chn
                 }
@@ -115,13 +115,13 @@ func SinglePlayerWs(c *gin.Context) {
             if flag {
                 flagged, err := game.flag(x, y)
                 if err==nil {
-                    send_flagged(flagged, x, y, conn)
+                    send_flagged(flagged, x, y, conn,false)
                 }
             }else{
                 timer = time.After(time.Duration(game_params.tempo)*time.Millisecond)
                 changes, err := game.click(x, y)
                 if err==nil {
-                    send_changes(&changes, conn, game.state)
+                    send_changes(&changes, conn, game.state, false)
                 }
             }
         }
@@ -141,4 +141,11 @@ func SinglePlayerPage(c *gin.Context) {
         return
     }
     shared.Render(c, http.StatusOK, "singlePlayer.html", gin.H{"game_id": game_id});
+}
+
+func get_timer(params *GameParams) <- chan time.Time{
+    if !params.timed {
+        return nil
+    }
+    return time.After(time.Duration(params.tempo) * time.Millisecond)
 }

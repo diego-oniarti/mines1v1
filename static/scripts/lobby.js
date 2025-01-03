@@ -29,3 +29,10 @@ function submitSingle(form) {
     });
     return false;
 }
+
+function submit1v1(form) {
+    get_game_id(form).then(id=>{
+        window.location.href = `/1v1?game_id=${id}`;
+    });
+    return false;
+}

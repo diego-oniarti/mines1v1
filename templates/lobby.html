@@ -44,7 +44,7 @@
 
                         <div class="flex" style="width: 90%;"> <h2>Crea una partita</h2> </div>
                         <div class="hr2"></div><br/>
-                        <form action="/1v1" method="get">
+                        <form onsubmit="return submit1v1(this)">
                             <div class="horizontal">
                                 <div class="form_fields">
                                     <span>
@@ -65,10 +65,9 @@
                         <div class="hr2"></div><br/>
                         <form action="/1v1" method="get">
                             <div class="form_fields">
-                                <span><input name="code" placeholder="codice"></span>
+                                <span><input name="game_id" placeholder="codice"></span>
                             </div>
                             <input type="submit" value="Unisciti">
-                            <input type="hidden" value="join">
                         </form>
                     </div>
                     <div class="section">

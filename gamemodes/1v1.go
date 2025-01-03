@@ -1,14 +1,13 @@
 package gamemodes
 
 import (
-	"log"
-	"net/http"
-	"time"
+    "log"
+    "net/http"
+    "time"
 
-	"github.com/diego-oniarti/mines1v1/shared"
-	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
-	_ "github.com/gorilla/websocket"
+    "github.com/diego-oniarti/mines1v1/shared"
+    "github.com/gin-gonic/gin"
+    _ "github.com/gorilla/websocket"
 )
 
 func M1v1Ws(c *gin.Context) {
@@ -20,15 +19,19 @@ func M1v1Ws(c *gin.Context) {
     }
     defer conn.Close()
 
+    // Il client manda un messaggio con il game_id (stringa)
     messageType, game_id, err := conn.ReadMessage()
-    if err != nil || messageType!=1 { return }
+    if err != nil || messageType!=1 {
+        log.Println(err)
+        return 
+    }
 
     game_id_str := string(game_id[:])
     game_instance, ok := games[game_id_str]
+    if !ok { return } // se il game_id non esiste esci
     game_params := game_instance.params
-    if !ok { return }
-    delete(games, game_id_str)
 
+    // Manda i parametri al client
     err = conn.WriteMessage(2, arrToBuff([]uint16{
         game_params.width,
         game_params.height,
@@ -36,59 +39,111 @@ func M1v1Ws(c *gin.Context) {
         game_params.tempo,
     }))
 
+    is_g1 := true
+    to_other_chn := game_instance.a_to_b
+    from_other_chn := game_instance.b_to_a
+    other_conn := game_instance.g2 // Qui è nil
+    if game_instance.g1==nil {
+        game_instance.g1 = conn
+        defer delete(games, game_id_str) // Lascia chiudere solo il primo. Così se il secondo non arriva mai chiude comunque
+
+        <-from_other_chn // Aspetta si sia connesso G2
+        other_conn = game_instance.g2
+    }else{
+        game_instance.g2 = conn
+        is_g1 = false
+        to_other_chn = game_instance.b_to_a
+        from_other_chn = game_instance.a_to_b
+        other_conn = game_instance.g1
+
+        to_other_chn <- 1 // avvisa che si è connesso G2
+    }
+
     var game *Game
+    var timer <-chan time.Time
+    isFirstMove := is_g1; // g2 non ha mai la prima mossa
+    waiting_other := false // G2 inizia aspettando l'altro
 
-    for {
-        isFirstMove := true;
+    if !is_g1 { // Aspetta la prima mossa dal g1
+        <- from_other_chn
+        game = game_instance.game // Settato da g1
+    }
 
-        remaining_time := time.Duration(game_params.tempo)*time.Millisecond
-        var last_move time.Time
+    move_chn := make(chan []byte, 1)
+    message_type_chn := make(chan int, 1)
+    error_chn := make(chan error, 1)
 
-        for game==nil || game.state==Running {
-            if !isFirstMove && game_params.timed {
-                conn.SetReadDeadline(time.Now().Add(remaining_time))
-            }
+    go func() {
+        for {
             messageType, move, err := conn.ReadMessage()
-            if err != nil {
-                if websocket.IsCloseError(err, 1001) {
-                    return
-                }
-                changes := game.get_loosing_message()
-                game.state=Lost
-                send_changes(&changes, conn, game.state)
+            if err!=nil {
+                error_chn <- err
                 return
             }
-            if messageType!=2 { return } // messageType: 1=text; 2=binary
+            message_type_chn <- messageType
+            move_chn <- move
+        }
+    }()
+    for {
+        var move []byte
+        var messageType int
+        var err error
+        select {
+        case move=<-move_chn:
+            if waiting_other {
+                if is_g1 {
+                    log.Println("G1 waiting other")
+                } else {
+                    log.Println("G2 waiting other")
+                }
+                continue 
+            } // Scarta i messaggi mandati mentre in attesa
+            messageType=<-message_type_chn
+            if messageType != 1 && messageType != 2 {
+                return
+            }
             x,y,flag := bytesToMove(move)
 
             if isFirstMove {
-                if flag { continue }
-                game = NewGame(game_params.width, game_params.height,
-                game_params.bombs, game_params.tempo,
-                x,y)
-                isFirstMove=false
+                if flag {continue} // Ignora la prima mossa se è una flag
+
+                // G1 crea il game
+                if is_g1 {
+                    game = NewGame(game_params.width, game_params.height,
+                    game_params.bombs, game_params.tempo,
+                    x,y)
+                    game_instance.game = game
+                    timer = get_timer(&game_params)
+                }
+                isFirstMove = false
             }
 
             if flag {
                 flagged, err := game.flag(x, y)
-                if err==nil {
-                    remaining_time = remaining_time - time.Now().Sub(last_move)
-                    send_flagged(flagged, x, y, conn)
+                if err!=nil {
+                    log.Println(err)
+                }else{
+                    send_flagged(flagged, x, y, conn, false)
+                    send_flagged(flagged, x, y, other_conn, true)
                 }
             }else{
-                changes, err := game.click(x, y)
-                if err==nil {
-                    send_changes(&changes, conn, game.state)
-                    remaining_time = time.Duration(game_params.tempo)*time.Millisecond
+                changes, err := game.click(x,y)
+                if err!=nil {
+                    log.Println(err)
+                    return
                 }
+                send_changes(&changes, conn, game.state, false)
+                send_changes(&changes, other_conn, game.state, true)
+                to_other_chn <- 1
+                waiting_other = true                 // Dopo aver fatto la mossa inizia ad aspettare l'altro
             }
-            last_move = time.Now()
-        }
-
-        game=nil
-        messageType, _, err := conn.ReadMessage()
-        if err!=nil || messageType!=2 {
+        case err=<-error_chn:
+            log.Println(err)
             return
+        case <-timer:
+            if waiting_other { continue } // Scarta i messaggi mandati mentre in attesa
+        case <- from_other_chn:
+            waiting_other = false
         }
     }
 }
@@ -99,6 +154,7 @@ func M1v1Page(c *gin.Context) {
         c.Status(400)
         return
     }
+    // controlla che il game_id sia valido. Previene reflect injection
     if _, present := games[game_id]; !present {
         c.Status(400)
         return
