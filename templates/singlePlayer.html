@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         {{template "header" .}}
-        <link href="/static/css/form.css" rel="stylesheet">
+        <link href="/static/css/form.css" rel="stylesheet" />
         <script src="https://cdn.jsdelivr.net/npm/p5@1.11.1/lib/p5.min.js"></script>
         <script src="/static/scripts/singlePlayer.js" defer></script>
     </head>
@@ -15,13 +15,24 @@
                 <div class="box clear">
                     <div id="gameSection" class="section centered">
                         <div class="resizable" id="gameBox">
-                            <br/>
+                            <span id="timer_span"></span> <br />
+                            <span id="bomb_span"></span> <br />
+                            <br />
                         </div>
-                        <br/>
+                        <br />
                         <div class="hidden" id="endgame_controls">
                             <span>
-                                <input id="replay" type="button" value="play again"/>
-                                <a href="/lobby"><input id="goback" type="button" value="back to lobby"/></a>
+                                <input
+                                    id="replay"
+                                    type="button"
+                                    value="play again"
+                                />
+                                <a href="/lobby"
+                                    ><input
+                                        id="goback"
+                                        type="button"
+                                        value="back to lobby"
+                                /></a>
                             </span>
                         </div>
                     </div>
