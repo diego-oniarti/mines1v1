@@ -181,6 +181,8 @@ function mousePressed() {
 
     if (!flag && !cronometro) {
         cronometro = new Date();
+        placed_flags = 0;
+        bomb_span.innerText = `${placed_flags}/${tot_bombs}`;
         total_time = null;
     }
 
@@ -219,6 +221,7 @@ function get_game_params(data_view) {
     }
     [grid_width, grid_height, tot_bombs, time] = data;
     a();
+    bomb_span.innerText = `${placed_flags}/${tot_bombs}`;
     phase = phases.GetUpdates;
     for (let y = 0; y < grid_width; y++) {
         celle.push([]);
@@ -231,7 +234,7 @@ function get_game_params(data_view) {
 /**
  * @param {DataView} data_view
  */
-
+let placed_flags = 0;
 function get_updates(data_view) {
     const first_byte = data_view.getInt8(0);
     type = first_byte >> 6;
@@ -255,6 +258,10 @@ function get_updates(data_view) {
                 if (lost) {
                     celle[y][x] = new Cella(false, 0, true);
                 } else {
+                    if (celle[y][x]?.flag) {
+                        placed_flags--;
+                        bomb_span.innerText = `${placed_flags}/${tot_bombs}`;
+                    }
                     celle[y][x] = new Cella(false, num, false);
                 }
             } while (has_next);
@@ -278,9 +285,12 @@ function get_updates(data_view) {
             const y = data_view.getUint16(3);
             if (flag) {
                 celle[y][x] = new Cella(true, 0, false);
+                placed_flags++;
             } else {
                 celle[y][x] = null;
+                placed_flags--;
             }
+            bomb_span.innerText = `${placed_flags}/${tot_bombs}`;
             break;
     }
 }

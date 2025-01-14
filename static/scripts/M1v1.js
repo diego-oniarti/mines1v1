@@ -20,6 +20,20 @@ let b = new Promise((r) => {
 });
 let cellSize = 40;
 
+let placed_bombs = 0;
+const bomb_span = document.getElementById("bomb_span");
+function update_bombs() {
+    bomb_span.innerText = `🏳${placed_bombs}/${tot_bombs}`;
+}
+function sub_flag() {
+    placed_bombs--;
+    update_bombs();
+}
+function add_flag() {
+    placed_bombs++;
+    update_bombs();
+}
+
 class Cella {
     constructor(flag, number, bomb, player) {
         this.flag = flag;
@@ -239,6 +253,7 @@ function get_game_params(data_view) {
             celle[y].push(null);
         }
     }
+    update_bombs();
 }
 
 /**
@@ -273,6 +288,9 @@ function get_updates(data_view) {
                 if (lost) {
                     celle[y][x] = new Cella(false, 0, true, player);
                 } else {
+                    if (celle[y][x]?.flag) {
+                        sub_flag();
+                    }
                     celle[y][x] = new Cella(false, num, false, player);
                 }
 
@@ -311,8 +329,10 @@ function get_updates(data_view) {
             first_y = y;
             if (flag) {
                 celle[y][x] = new Cella(true, 0, false, player);
+                add_flag();
             } else {
                 celle[y][x] = null;
+                sub_flag();
             }
             break;
     }
@@ -334,6 +354,8 @@ play_again.addEventListener("click", () => {
         }
     }
 
+    placed_bombs = 0;
+    update_bombs();
     socket.send("replay");
     phase = phases.GetUpdates;
 });
