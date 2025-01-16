@@ -1,17 +1,29 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Verification Email</title>
     </head>
     <body>
-        <h2>Verifica la tua mail</h2>
-        <p>Ciao {{.Name}},</p>
-        <p>Per verificare la creaizone del tuo account premi il pulsante:</p>
+        <h2>Verify your email</h2>
+        <p>Hello {{.Name}},</p>
+        <p>To verify your credentials press the button:</p>
         <form action="http://127.0.0.1:2357/verify" method="post">
-            <input type="hidden" value="{{.Code}}" name="code">
-            <input type="submit" value="Verifica Mail" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; background-color: #4CAF50; text-decoration: none; border-radius: 5px;">
+            <input type="hidden" value="{{.Code}}" name="code" />
+            <input
+                type="submit"
+                value="Verifica Mail"
+                style="
+                    display: inline-block;
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    color: white;
+                    background-color: #4caf50;
+                    text-decoration: none;
+                    border-radius: 5px;
+                "
+            />
         </form>
     </body>
 </html>

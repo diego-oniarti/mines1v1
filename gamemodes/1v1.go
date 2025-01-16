@@ -164,12 +164,12 @@ func M1v1Ws(c *gin.Context) {
 func M1v1Page(c *gin.Context) {
 	game_id := c.Query("game_id")
 	if game_id == "" {
-		c.Status(400)
+		c.Redirect(http.StatusTemporaryRedirect, "/lobby")
 		return
 	}
 	// controlla che il game_id sia valido. Previene reflect injection
 	if _, present := games[game_id]; !present {
-		c.Status(400)
+		c.Redirect(http.StatusTemporaryRedirect, "/lobby")
 		return
 	}
 	shared.Render(c, http.StatusOK, "1v1.html", gin.H{"game_id": game_id})

@@ -10,7 +10,7 @@ function validaLogin(form) {
     const errors = [];
 
     if (!mail.match(/.+@.+\..+/)) {
-        errors.push("Mail non valida")
+        errors.push("Invalid email")
     }
 
     if ((psw.length<8)
@@ -18,7 +18,7 @@ function validaLogin(form) {
         || (!psw.match(/[a-z]/))
         || (!psw.match(/[A-Z]/))
         || (!psw.match(/[0-9]/))) {
-        errors.push("Password non valida")
+        errors.push("Invalid password")
     }
 
     if (errors.length>0) {
@@ -47,29 +47,29 @@ function validaRegistrazione(form) {
     const errors = [];
 
     if (nome.length<1) {
-        errors.push("L'username deve avere almeno 1 carattere");
+        errors.push("Username can't be empty");
     }
     if (!mail.match(/.+@.+\..+/)) {
-        errors.push("Inserisci una mail valida");
+        errors.push("Invalid email");
     }
     if (psw.length<8) {
-        errors.push("La passwoed deve contenere almeno 8 caratteri");
+        errors.push("Lassword must be at least 8 characters");
     }
     if (!psw.match(/[_!?(){}#$%^&*.,+\[\]=+"']/)) {
         console.log(psw)
-        errors.push("La password deve contenere almeno 1 carattere speciale (!@#$%^&*()_+-=[]{})");
+        errors.push("Password must contain at least 1 special character (!@#$%^&*()_+-=[]{})");
     }
     if (!psw.match(/[a-z]/)) {
-        errors.push("La password deve contenere almeno 1 carattere minuscolo");
+        errors.push("Password must contain at least 1 uppercase character");
     }
     if (!psw.match(/[A-Z]/)) {
-        errors.push("La password deve contenere almeno 1 carattere maiuscolo");
+        errors.push("Password must contain at least 1 lowercase character");
     }
     if (!psw.match(/[0-9]/)) {
-        errors.push("La password deve contenere almeno 1 numero");
+        errors.push("Password must contain at least 1 number");
     }
     if (psw!=psw2) {
-        errors.push("Conferma password");
+        errors.push("Confirm password");
     }
 
 

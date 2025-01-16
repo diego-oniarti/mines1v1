@@ -10,49 +10,85 @@
             <div class="boxes">
                 <div class="box">
                     <div class="section centered">
-                        <a href="/lobby"><img src="/static/images/play.png"></a>
+                        <a href="/lobby"
+                            ><img src="/static/images/play.png"
+                        /></a>
                     </div>
                 </div>
                 <div class="box">
-                    <div class="flex collapseButton"><h1>Come Giocare</h1> <div class="V"></div></div>
+                    <div class="flex collapseButton">
+                        <h1>How To Play</h1>
+                        <div class="V"></div>
+                    </div>
                     <div class="hr"></div>
                     <div class="section">
                         <p>
-                            Campo minato può sembrare un gioco astruso o complesso a primo occhio, ma credo questo sia solo l'effetto di una brutta anomea che il gioco ha preso nel tempo. <br>
-                            Le regole sono poche e piuttosto semplici:
+                            Minesweeper can seem a complex game at first glance,
+                            but it really is simpler than it seems. <br />
+                            The rules are few and simple:
                         </p>
                         <ul>
-                            <li>Alcune celle contengono bombe</li>
-                            <li>Ogni cella "sicura" contiene il numero di bombe che la circondano</li>
+                            <li>Some cells contain bombs</li>
+                            <li>
+                                Every safe cell contains the number of
+                                surrounding bombs
+                            </li>
                             <ul>
-                                <li>Vengono considerate le 8 celle circostanti incluse le diagonali</li>
+                                <li>
+                                    The count also considers cells neighboring
+                                    along the diagonals
+                                </li>
                             </ul>
-                            <li>Quando una cella con il valore di 0 viene scoperta, tutte quelle circostanti vengono scoperte a loro volta</li>
+                            <li>
+                                Revealing a cell with no neighboring bombs will
+                                automatically reveal all surrounding cells
+                            </li>
                             <ul>
-                                <li>Questo passaggio va poi a ripetersi sulle celle così scoperte</li>
+                                <li>
+                                    This behaviour is then replicated on the
+                                    neighboring cells, sometimes revealing large
+                                    portions of the map
+                                </li>
                             </ul>
-                            <li>Quando scopri una bomba perdi</li>
-                            <li>Quando scopri tutte le celle sicure vinci</li>
+                            <li>Revealing a bomb makes you lose the game</li>
+                            <ul>
+                                <li>
+                                    You can place flags on cells that you
+                                    suspect may hide a bomb, to keep track of
+                                    them
+                                </li>
+                            </ul>
+                            <li>
+                                You win the game by revealing all safe cells
+                            </li>
                         </ul>
-                        <div class="flex" style="width: 90%;">
-                            <h2>Un esempio</h2>
+                        <div class="flex" style="width: 90%">
+                            <h2>Example</h2>
                         </div>
                         <div class="hr2"></div>
-                        <figure style="float: right; width: min-content;">
-                            <img src="/static/images/example1.png">
-                            <figcaption>Esempio 1</figcaption>
+                        <figure style="float: right; width: min-content">
+                            <img src="/static/images/example1.png" />
+                            <figcaption>Example 1</figcaption>
                         </figure>
                         <p>
-                            Un trucco utile è quello di guardare gli angoli. In questo caso la cella cerchiata in verde ha una sola bomba che la circonda (come indicato dal numero 1). <br\>
-                            Quindi la cella gialla (che è l'unica libera) sarà per forza una bomba. <br/>
-                            Possiamo contrassegnarla con una bandierina per ricordarcene.
+                            An useful tip is to look at corners. In this case,
+                            the cell circled in greed neighbors only 1 bomb (as
+                            stated by its number) <br />
+                            This tells us that the yellow cell must contain a
+                            bomb (since it is the only free cell neighboring
+                            green). <br />
+                            We can put a flag on the yellow cell to remember
+                            this fact
                         </p>
-                        <figure style="float: left; width: min-content;">
-                            <img src="/static/images/example2.png">
-                            <figcaption>Esempio 2</figcaption>
+                        <figure style="float: left; width: min-content">
+                            <img src="/static/images/example2.png" />
+                            <figcaption>Example 2</figcaption>
                         </figure>
                         <p>
-                            Ora l'altra cella con il numero 1 ha una bandiera vicino. Possiamo quindi assumere che le altre celle attorno a questa siano sicure. In questo caso ce n'è soltanto una.
+                            This cell only has one neighboring bomb (as stated
+                            by its number) and we know where it is thanks to the
+                            flag. We can safely reveal the rest of its
+                            neighboring cells, only one in this case
                         </p>
                     </div>
                 </div>

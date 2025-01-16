@@ -142,11 +142,11 @@ func SinglePlayerWs(c *gin.Context) {
 func SinglePlayerPage(c *gin.Context) {
 	game_id := c.Query("game_id")
 	if game_id == "" {
-		c.Status(400)
+		c.Redirect(http.StatusTemporaryRedirect, "/lobby")
 		return
 	}
 	if _, present := games[game_id]; !present {
-		c.Status(400)
+		c.Redirect(http.StatusTemporaryRedirect, "/lobby")
 		return
 	}
 	shared.Render(c, http.StatusOK, "singlePlayer.html", gin.H{"game_id": game_id})

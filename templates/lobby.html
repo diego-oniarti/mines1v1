@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         {{template "header" .}}
-        <link rel="stylesheet" href="/static/css/form.css">
+        <link rel="stylesheet" href="/static/css/form.css" />
         <script src="/static/scripts/lobby.js"></script>
     </head>
     <body class="dark">
@@ -12,68 +12,159 @@
 
             <div class="boxes">
                 <div class="box">
-                    <div class="flex collapseButton"><h1>Giocatore Singolo</h1> <div class="V"></div></div>
+                    <div class="flex collapseButton">
+                        <h1>Singleplayer</h1>
+                        <div class="V"></div>
+                    </div>
                     <div class="hr"></div>
                     <div class="section centered">
                         <form onsubmit="return submitSingle(this)">
                             <div class="horizontal">
                                 <div class="form_fields">
                                     <span>
-                                        <input min="1" name="width" value="18" type="number" placeholder="width" required>
+                                        <input
+                                            min="1"
+                                            name="width"
+                                            value="18"
+                                            type="number"
+                                            placeholder="width"
+                                            required
+                                        />
                                         x
-                                        <input min="1" name="height" value="14" type="number" placeholder="height" required>
+                                        <input
+                                            min="1"
+                                            name="height"
+                                            value="14"
+                                            type="number"
+                                            placeholder="height"
+                                            required
+                                        />
                                     </span>
-                                    <span>Bombe <input min="1" type="number" name="bombs" placeholder="bombs" value="40" required></span>
-                                    <span>Tempo <div class="toggle"><input name="timed" type="checkbox"><div class="toggle_nob"></div></div></span>
-                                    <span><input min="1" type="number" name="tempo" placeholder="tempo" value="3000">ms</span>
+                                    <span
+                                        >Bombs
+                                        <input
+                                            min="1"
+                                            type="number"
+                                            name="bombs"
+                                            placeholder="bombs"
+                                            value="40"
+                                            required
+                                    /></span>
+                                    <span
+                                        >Time
+                                        <div class="toggle">
+                                            <input
+                                                name="timed"
+                                                type="checkbox"
+                                            />
+                                            <div class="toggle_nob"></div></div
+                                    ></span>
+                                    <span
+                                        ><input
+                                            min="1"
+                                            type="number"
+                                            name="tempo"
+                                            placeholder="time"
+                                            value="3000"
+                                        />ms</span
+                                    >
                                 </div>
-                                <input type="submit" value="Gioca">
+                                <input type="submit" value="Play" />
                             </div>
                         </form>
                     </div>
                     <div class="section">
                         <p>
-                            Gioca da solo per allenarti nella versione classica, o sfida il cronometro nella versione a tempo.
+                            Play alone to train in the classic game of
+                            minesweeper or race the clock in the timed mode.
                         </p>
                     </div>
                 </div>
                 <div class="box">
-                    <div class="flex collapseButton"><h1>1v1</h1> <div class="V"></div></div>
+                    <div class="flex collapseButton">
+                        <h1>1v1</h1>
+                        <div class="V"></div>
+                    </div>
                     <div class="hr"></div>
                     <div class="section centered">
-
-                        <div class="flex" style="width: 90%;"> <h2>Crea una partita</h2> </div>
-                        <div class="hr2"></div><br/>
+                        <div class="flex" style="width: 90%">
+                            <h2>Create game</h2>
+                        </div>
+                        <div class="hr2"></div>
+                        <br />
                         <form onsubmit="return submit1v1(this)">
                             <div class="horizontal">
                                 <div class="form_fields">
                                     <span>
-                                        <input min="1" name="width" value="18" type="number" placeholder="width" required>
+                                        <input
+                                            min="1"
+                                            name="width"
+                                            value="18"
+                                            type="number"
+                                            placeholder="width"
+                                            required
+                                        />
                                         x
-                                        <input min="1" name="height" value="14" type="number" placeholder="height" required>
+                                        <input
+                                            min="1"
+                                            name="height"
+                                            value="14"
+                                            type="number"
+                                            placeholder="height"
+                                            required
+                                        />
                                     </span>
-                                    <span>Bombe <input min="1" type="number" name="bombs" placeholder="bombs" value="40" required></span>
-                                    <span>Tempo <div class="toggle"><input name="timed" type="checkbox"><div class="toggle_nob"></div></div></span>
-                                    <span><input min="1" type="number" name="tempo" placeholder="tempo" value="3000">ms</span>
+                                    <span
+                                        >Bombs
+                                        <input
+                                            min="1"
+                                            type="number"
+                                            name="bombs"
+                                            placeholder="bombs"
+                                            value="40"
+                                            required
+                                    /></span>
+                                    <span
+                                        >Time
+                                        <div class="toggle">
+                                            <input
+                                                name="timed"
+                                                type="checkbox"
+                                            />
+                                            <div class="toggle_nob"></div></div
+                                    ></span>
+                                    <span
+                                        ><input
+                                            min="1"
+                                            type="number"
+                                            name="tempo"
+                                            placeholder="time"
+                                            value="3000"
+                                        />ms</span
+                                    >
                                 </div>
-                                <input type="submit" value="Gioca">
+                                <input type="submit" value="Play" />
                             </div>
-                            <input type="hidden" value="create">
+                            <input type="hidden" value="create" />
                         </form>
 
-                        <div class="flex" style="width: 90%;"> <h2>Unisciti</h2> </div>
-                        <div class="hr2"></div><br/>
+                        <div class="flex" style="width: 90%"><h2>Join</h2></div>
+                        <div class="hr2"></div>
+                        <br />
                         <form action="/1v1" method="get">
                             <div class="form_fields">
-                                <span><input name="game_id" placeholder="codice"></span>
+                                <span
+                                    ><input name="game_id" placeholder="code"
+                                /></span>
                             </div>
-                            <input type="submit" value="Unisciti">
+                            <input type="submit" value="Join" />
                         </form>
                     </div>
                     <div class="section">
                         <p>
-                            Gioca con un amico. Il primo a colpire una bomba o esaurire il tempo perde.<br/>
-                            Vincere la partita porta a un pareggio.
+                            Play with a frient! First one to hit a bomb or run
+                            out of time looses. <br />
+                            Completing the board leads to a draw.
                         </p>
                     </div>
                 </div>

@@ -148,7 +148,7 @@ function draw() {
         case phases.GetUpdates:
             if (time == 0 || !timer_start) break;
             const R = Math.min(width, height) * 0.8;
-            const c = turn ? color(180, 40, 40, 30) : color(40, 40, 180, 30);
+            const c = !turn ? color(180, 40, 40, 30) : color(40, 40, 180, 30);
             stroke(c);
             noFill();
             strokeWeight(20);
