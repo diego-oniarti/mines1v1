@@ -18,9 +18,26 @@
                     </div>
                     <div class="hr"></div>
                     <div class="section centered">
-                        <form onsubmit="return submitSingle(this)">
+                        <form
+                            id="form_single"
+                            onsubmit="return submitSingle(this)"
+                        >
                             <div class="horizontal">
                                 <div class="form_fields">
+                                    <select
+                                        name="difficulty"
+                                        id="single_difficulty"
+                                    >
+                                        <option value="easy">easy</option>
+                                        <option
+                                            value="medium"
+                                            selected="selected"
+                                        >
+                                            medium
+                                        </option>
+                                        <option value="hard">hard</option>
+                                        <option value="custom">custom</option>
+                                    </select>
                                     <span>
                                         <input
                                             min="1"
@@ -29,6 +46,7 @@
                                             type="number"
                                             placeholder="width"
                                             required
+                                            disabled
                                         />
                                         x
                                         <input
@@ -38,6 +56,7 @@
                                             type="number"
                                             placeholder="height"
                                             required
+                                            disabled
                                         />
                                     </span>
                                     <span
@@ -49,6 +68,7 @@
                                             placeholder="bombs"
                                             value="40"
                                             required
+                                            disabled
                                     /></span>
                                     <span
                                         >Time
@@ -56,6 +76,8 @@
                                             <input
                                                 name="timed"
                                                 type="checkbox"
+                                                disabled
+                                                checked
                                             />
                                             <div class="toggle_nob"></div></div
                                     ></span>
@@ -66,6 +88,7 @@
                                             name="tempo"
                                             placeholder="time"
                                             value="3000"
+                                            disabled
                                         />ms</span
                                     >
                                 </div>
@@ -92,9 +115,24 @@
                         </div>
                         <div class="hr2"></div>
                         <br />
-                        <form onsubmit="return submit1v1(this)">
+                        <form id="form_1v1" onsubmit="return submit1v1(this)">
                             <div class="horizontal">
                                 <div class="form_fields">
+                                    <select
+                                        name="difficulty"
+                                        id="M1v1_difficulty"
+                                    >
+                                        <option value="easy">easy</option>
+                                        <option
+                                            value="medium"
+                                            selected="selected"
+                                        >
+                                            medium
+                                        </option>
+                                        <option value="hard">hard</option>
+                                        <option value="custom">custom</option>
+                                    </select>
+
                                     <span>
                                         <input
                                             min="1"
@@ -103,6 +141,7 @@
                                             type="number"
                                             placeholder="width"
                                             required
+                                            disabled
                                         />
                                         x
                                         <input
@@ -112,6 +151,7 @@
                                             type="number"
                                             placeholder="height"
                                             required
+                                            disabled
                                         />
                                     </span>
                                     <span
@@ -123,6 +163,7 @@
                                             placeholder="bombs"
                                             value="40"
                                             required
+                                            disabled
                                     /></span>
                                     <span
                                         >Time
@@ -130,6 +171,8 @@
                                             <input
                                                 name="timed"
                                                 type="checkbox"
+                                                disabled
+                                                checked
                                             />
                                             <div class="toggle_nob"></div></div
                                     ></span>
@@ -140,6 +183,7 @@
                                             name="tempo"
                                             placeholder="time"
                                             value="3000"
+                                            disabled
                                         />ms</span
                                     >
                                 </div>

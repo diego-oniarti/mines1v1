@@ -34,7 +34,18 @@ html {
 }
 
 body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        "Open Sans",
+        "Helvetica Neue",
+        sans-serif;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -44,13 +55,34 @@ body {
     background-color: var(--shade8);
 }
 
-p, h2, h3, li, a, b, span, label, code, figcaption, input {
+p,
+h2,
+h3,
+li,
+a,
+b,
+span,
+label,
+code,
+figcaption,
+input,
+select {
     color: var(--shade2);
 }
 h1 {
     color: var(--shade1);
 }
-.dark p, .dark h1, .dark h2, .dark h3, .dark li, .dark a, .dark b, .dark span, .dark label, .dark code, .dark figcaption {
+.dark p,
+.dark h1,
+.dark h2,
+.dark h3,
+.dark li,
+.dark a,
+.dark b,
+.dark span,
+.dark label,
+.dark code,
+.dark figcaption {
     color: var(--shade8);
 }
 
@@ -59,7 +91,8 @@ body.dark {
     color: var(--shade8);
 }
 
-p,ul {
+p,
+ul {
     font-size: large;
 }
 
@@ -91,12 +124,15 @@ ul {
     height: 2px;
     background-color: var(--shade1);
 }
-div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
+div:has(+ .hr2) h2,
+div:has(+ .hr) h1,
+h1:has(+ .hr),
+h2:has(+ .hr2) {
     margin-bottom: 6px;
 }
 
-
-.dark .hr, .dark .hr2 {
+.dark .hr,
+.dark .hr2 {
     background-color: var(--shade8);
 }
 
@@ -177,8 +213,6 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
     display: none;
 }
 
-
-
 /* FOOTER */
 #footer {
     background-color: var(--shade1);
@@ -193,13 +227,11 @@ div:has(+.hr2) h2, div:has(+.hr) h1 ,h1:has(+.hr), h2:has(+.hr2) {
 }
 .dark #footer p {
     color: var(--shade1);
-} 
+}
 
 .dark #footer {
     background-color: var(--shade8);
 }
-
-
 
 /* VARIE */
 .bordered {
@@ -309,19 +341,42 @@ img {
     flex-direction: row;
 }
 
-#p1, #p2, #p3, #p4, #p5, #p6, #p7, #p8 {
+#p1,
+#p2,
+#p3,
+#p4,
+#p5,
+#p6,
+#p7,
+#p8 {
     width: 20px;
     height: 20px;
 }
 
-#p1 { background-color: var(--shade1); }
-#p2 { background-color: var(--shade2); }
-#p3 { background-color: var(--shade3); }
-#p4 { background-color: var(--shade4); }
-#p5 { background-color: var(--shade5); }
-#p6 { background-color: var(--shade6); }
-#p7 { background-color: var(--shade7); }
-#p8 { background-color: var(--shade8); }
+#p1 {
+    background-color: var(--shade1);
+}
+#p2 {
+    background-color: var(--shade2);
+}
+#p3 {
+    background-color: var(--shade3);
+}
+#p4 {
+    background-color: var(--shade4);
+}
+#p5 {
+    background-color: var(--shade5);
+}
+#p6 {
+    background-color: var(--shade6);
+}
+#p7 {
+    background-color: var(--shade7);
+}
+#p8 {
+    background-color: var(--shade8);
+}
 
 @media only screen and (max-width: 768px) {
     /* For mobile phones: */
@@ -331,17 +386,19 @@ img {
     .boxes {
         row-gap: 0px;
     }
-    #mainContainer, .boxes, .box {
+    #mainContainer,
+    .boxes,
+    .box {
         width: 100%;
     }
     .box {
         border-radius: 0%;
     }
     #titoloPagina {
-        font-size:5rex;
+        font-size: 5rex;
     }
     #navBar {
-        font-size:unset;
+        font-size: unset;
         text-overflow: clip;
     }
     #hobby-contatti {
@@ -362,6 +419,4 @@ img {
         max-height: 0;
         transition: max-height 200ms ease-in-out;
     }
-
-    
 }
